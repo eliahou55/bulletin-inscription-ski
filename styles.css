@@ -308,9 +308,27 @@ header p {
 }
 
 .member-room {
-    max-width: 60px;
-    text-align: center;
+    width: 100%;
+    min-width: 110px;
+    padding: 8px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    font-size: 0.9em;
     font-weight: 600;
+    font-family: inherit;
+    background: white;
+    cursor: pointer;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.member-room.invalid-room {
+    border-color: #dc2626;
+    box-shadow: 0 0 0 2px rgba(220, 38, 38, 0.15);
+}
+
+.recap-supplement-value {
+    color: var(--accent-color);
+    font-weight: 700;
 }
 
 .rooms-breakdown {
@@ -789,7 +807,7 @@ header p {
         border: none;
     }
 
-    /* Âge */
+    /* Chambre */
     .family-table td:nth-child(4) {
         grid-column: 1;
         grid-row: 3;
@@ -798,12 +816,6 @@ header p {
         display: flex;
         align-items: center;
         gap: 4px;
-        font-size: 0.85em;
-        color: var(--text-light);
-    }
-
-    .family-table td:nth-child(4)::before {
-        content: 'Âge :';
         font-size: 0.85em;
         color: var(--text-light);
     }

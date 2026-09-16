@@ -78,6 +78,7 @@ function addFamilyRow(shouldCalculate = true) {
     row.dataset.extraTarif = '0';
     row.dataset.roomNumber = '1';
     row.dataset.promoted = 'false';
+    row.dataset.roomAutoAssigned = 'false';
     row.innerHTML = `
         <td><input type="text" class="family-nom" placeholder="Nom"></td>
         <td><input type="text" class="family-prenom" placeholder="Prénom"></td>
@@ -88,7 +89,7 @@ function addFamilyRow(shouldCalculate = true) {
                 <label class="type-radio-label"><input type="radio" class="member-type-radio" name="${radioName}" value="bebe"> Bébé</label>
             </div>
         </td>
-        <td><input type="number" class="member-room" min="1" max="20" value="1" title="Numéro de chambre"></td>
+        <td><select class="member-room" title="Chambre"><option value="1">Chambre 1</option></select></td>
         <td><span class="family-tarif-display">-</span></td>
         <td>
             <button type="button" class="btn-delete-row" onclick="deleteFamilyRow(this)">Supprimer</button>
@@ -196,13 +197,24 @@ function addFamilyRow(shouldCalculate = true) {
                 this.dataset.wasChecked = 'true';
                 optionsRow.style.display = '';
                 renderOptions(this.value);
+
+                // Première sélection d'une catégorie pour ce membre : on l'assigne
+                // automatiquement à la première chambre non pleine (remplissage à 4
+                // personnes max, bébés exclus), comme une vraie chambre par défaut.
+                if (row.dataset.roomAutoAssigned !== 'true') {
+                    const defaultRoom = getDefaultRoomForNewMember(row, this.value);
+                    row.querySelector('.member-room').value = defaultRoom;
+                    row.dataset.roomNumber = defaultRoom;
+                    row.dataset.roomAutoAssigned = 'true';
+                }
             }
             updateDisplay();
         });
     });
 
-    row.querySelector('.member-room').addEventListener('input', function() {
+    row.querySelector('.member-room').addEventListener('change', function() {
         row.dataset.roomNumber = parseInt(this.value) || 1;
+        row.dataset.roomAutoAssigned = 'true';
         calculateTotal();
     });
 
@@ -388,6 +400,109 @@ function getFamilyMembers() {
     return members;
 }
 
+// Détermine la chambre par défaut d'un membre qui vient de recevoir sa catégorie
+// pour la première fois : on remplit les chambres déjà utilisées jusqu'à
+// ROOM_MAX_PEOPLE (bébés exclus), puis on ouvre une nouvelle chambre.
+function getDefaultRoomForNewMember(currentRow, type) {
+    if (type === 'bebe') return 1;
+
+    const occupancy = {};
+    document.querySelectorAll('#familyTableBody .family-row').forEach(row => {
+        if (row === currentRow) return;
+        const t = row.dataset.type;
+        if (t === 'adulte' || t === 'enfant') {
+            const rn = parseInt(row.dataset.roomNumber) || 1;
+            occupancy[rn] = (occupancy[rn] || 0) + 1;
+        }
+    });
+
+    let candidate = 1;
+    while ((occupancy[candidate] || 0) >= ROOM_MAX_PEOPLE) candidate++;
+    return candidate;
+}
+
+// Regénère les options de chaque menu "Chambre" pour toujours proposer au moins
+// une chambre de plus que le maximum actuellement utilisé (permet d'en ouvrir une nouvelle).
+function refreshRoomOptions() {
+    let maxRoom = 1;
+    document.querySelectorAll('#familyTableBody .family-row').forEach(row => {
+        maxRoom = Math.max(maxRoom, parseInt(row.dataset.roomNumber) || 1);
+    });
+    const optionCount = maxRoom + 1;
+
+    document.querySelectorAll('.member-room').forEach(select => {
+        if (select.options.length === optionCount) return;
+        const current = select.value;
+        select.innerHTML = '';
+        for (let i = 1; i <= optionCount; i++) {
+            const opt = document.createElement('option');
+            opt.value = i;
+            opt.textContent = 'Chambre ' + i;
+            select.appendChild(opt);
+        }
+        select.value = current || '1';
+    });
+}
+
+// Découpe un nombre total de personnes en tailles de chambres toutes valides
+// (entre ROOM_MIN_PEOPLE et ROOM_MAX_PEOPLE), en remplissant au maximum et en
+// évitant de laisser un reliquat trop petit (ex: 5 -> [3, 2], jamais [4, 1]).
+function computeValidRoomSizes(total) {
+    if (total < ROOM_MIN_PEOPLE) return null;
+    const sizes = [];
+    let remaining = total;
+    while (remaining > 0) {
+        if (remaining <= ROOM_MAX_PEOPLE) {
+            sizes.push(remaining);
+            remaining = 0;
+        } else if (remaining - ROOM_MAX_PEOPLE < ROOM_MIN_PEOPLE) {
+            const firstSize = Math.ceil(remaining / 2);
+            sizes.push(firstSize, remaining - firstSize);
+            remaining = 0;
+        } else {
+            sizes.push(ROOM_MAX_PEOPLE);
+            remaining -= ROOM_MAX_PEOPLE;
+        }
+    }
+    return sizes;
+}
+
+// Calcule le coût théorique si tout le monde était regroupé le plus efficacement
+// possible : chambres toutes valides (2 à 4 personnes), adultes concentrés à 2 par
+// chambre pour couvrir le minimum de 3000€ avec le moins de promotions d'enfants
+// possible. Sert de référence pour afficher le surcoût d'une répartition en
+// chambres séparées — ne descend jamais sous le minimum réellement atteignable.
+function computeOptimalCost(adultsCount, enfantsCount) {
+    const total = adultsCount + enfantsCount;
+    if (total === 0) return 0;
+
+    const sizes = computeValidRoomSizes(total);
+    if (!sizes) {
+        // Pas de regroupement valide possible (ex: une seule personne) : tarif
+        // plein sans mutualisation, à titre indicatif uniquement.
+        return adultsCount * PRICES.adulte + enfantsCount * PRICES.enfant;
+    }
+
+    let remainingAdults = adultsCount;
+    let remainingEnfants = enfantsCount;
+    let total_cost = 0;
+
+    sizes.forEach(size => {
+        const roomAdults = Math.min(2, remainingAdults, size);
+        remainingAdults -= roomAdults;
+        const roomEnfants = Math.min(size - roomAdults, remainingEnfants);
+        remainingEnfants -= roomEnfants;
+
+        const adultsRevenue = roomAdults * PRICES.adulte;
+        const remaining = Math.max(0, ROOM_MIN_REVENUE - adultsRevenue);
+        const promoteCount = Math.min(roomEnfants, Math.ceil(remaining / PRICES.adulte));
+
+        total_cost += adultsRevenue + promoteCount * PRICES.adulte + (roomEnfants - promoteCount) * PRICES.enfant;
+    });
+
+    return total_cost;
+}
+
 // ===== RÉPARTITION PAR CHAMBRE =====
 // Chaque chambre doit contenir entre ROOM_MIN_PEOPLE et ROOM_MAX_PEOPLE personnes
 // (adultes + enfants ; les bébés ne comptent pas) et rapporter au moins
@@ -395,12 +510,14 @@ function getFamilyMembers() {
 // des enfants sont promus au tarif adulte (un par un, dans l'ordre du tableau)
 // jusqu'à ce que le minimum soit atteint ; les enfants restants gardent le tarif réduit.
 function computeRoomAssignments() {
+    refreshRoomOptions();
+
     const rows = Array.from(document.querySelectorAll('#familyTableBody .family-row'));
     const rooms = {};
 
     rows.forEach(row => {
-        const roomInput = row.querySelector('.member-room');
-        const roomNumber = parseInt(roomInput.value) || 1;
+        const roomSelect = row.querySelector('.member-room');
+        const roomNumber = parseInt(roomSelect.value) || 1;
         row.dataset.roomNumber = roomNumber;
 
         const type = row.dataset.type;
@@ -426,10 +543,11 @@ function computeRoomAssignments() {
 
             if (peopleCount < ROOM_MIN_PEOPLE) {
                 valid = false;
-                issue = `${peopleCount} personne${peopleCount > 1 ? 's' : ''} seulement (minimum ${ROOM_MIN_PEOPLE}, bébés non comptés)`;
+                const missing = ROOM_MIN_PEOPLE - peopleCount;
+                issue = `ne contient qu'${peopleCount} personne${peopleCount > 1 ? 's' : ''} — ajoutez ${missing} personne${missing > 1 ? 's' : ''} ou regroupez avec une autre chambre`;
             } else if (peopleCount > ROOM_MAX_PEOPLE) {
                 valid = false;
-                issue = `${peopleCount} personnes (maximum ${ROOM_MAX_PEOPLE}, bébés non comptés)`;
+                issue = `contient ${peopleCount} personnes (maximum ${ROOM_MAX_PEOPLE}, bébés non comptés) — déplacez quelqu'un vers une autre chambre`;
             }
 
             group.adults.forEach(row => {
@@ -468,8 +586,12 @@ function computeRoomAssignments() {
             });
 
             if (!valid) {
-                errors.push(`Chambre ${roomNumber} : ${issue}`);
+                errors.push(`Chambre ${roomNumber} ${issue}`);
             }
+
+            [...group.adults, ...group.enfants, ...group.bebes].forEach(row => {
+                row.querySelector('.member-room').classList.toggle('invalid-room', !valid);
+            });
         });
 
     // Rafraîchir l'affichage du tarif de chaque ligne
@@ -477,6 +599,7 @@ function computeRoomAssignments() {
         const tarifDisplay = row.querySelector('.family-tarif-display');
         if (!row.dataset.type) {
             tarifDisplay.textContent = '-';
+            row.querySelector('.member-room').classList.remove('invalid-room');
             return;
         }
         const base = parseInt(row.dataset.baseTarif) || 0;
@@ -571,6 +694,25 @@ function calculateTotal() {
     } else {
         recapOptionsRow.style.display = 'none';
     }
+
+    // Supplément lié au choix de séparer la famille en plusieurs chambres, par
+    // rapport au regroupement le plus économique possible (référence informative).
+    const recapSupplementRow = document.getElementById('recapSupplementRow');
+    if (errors.length === 0 && (countAdulte + countEnfant) > 0) {
+        const optimalCost = computeOptimalCost(countAdulte, countEnfant);
+        const supplement = Math.max(0, (tarifAdulte + tarifEnfant) - optimalCost);
+        if (supplement > 0) {
+            recapSupplementRow.style.display = '';
+            document.getElementById('recapSupplement').textContent = '+' + formatPrice(supplement);
+        } else {
+            recapSupplementRow.style.display = 'none';
+        }
+    } else {
+        recapSupplementRow.style.display = 'none';
+    }
+
+    // Bloquer la soumission tant qu'une chambre est invalide
+    document.querySelector('.btn-submit').disabled = errors.length > 0;
 
     // Afficher le total correct (avec ou sans remise)
     if (remiseAmount > 0 && remisePercentage > 0) {
@@ -687,6 +829,8 @@ function getFormData() {
     const remiseDifference = remiseAmount > 0 ? (total - remiseAmount) : 0;
     const remisePourcentage = (remiseAmount > 0 && total > 0) ? Math.round((remiseDifference / total) * 100) : 0;
     const taxeSejour = countAdulte * PRICES.taxeSejourParAdulte;
+    const optimalCost = computeOptimalCost(countAdulte, countEnfant);
+    const supplementChambres = Math.max(0, (tarifAdulte + tarifEnfant) - optimalCost);
 
     return {
         nomContact: document.getElementById('nomContact').value.trim(),
@@ -703,6 +847,8 @@ function getFormData() {
         tarifChambresEnfants: tarifEnfant,
         tarifBebes: tarifBebe,
         tarifOptions: tarifOptions,
+        tarifChambresOptimal: optimalCost,
+        supplementChambres: supplementChambres,
         roomsOrganisateur: getOrganizerRooms(),
         notes: document.getElementById('notes').value.trim() || '',
         paiementIntegral: document.getElementById('paiementIntegral').checked,
@@ -889,6 +1035,9 @@ function generateDevisPDF(formData, download = true) {
     }
     if ((formData.tarifOptions || 0) > 0) {
         doc.text('Options ski (location / cours) : ' + formData.tarifOptions + '€', 10, y); y += 5;
+    }
+    if ((formData.supplementChambres || 0) > 0) {
+        doc.text('Supplément choix de chambres séparées : +' + formData.supplementChambres + '€', 10, y); y += 5;
     }
     y += 4;
 
