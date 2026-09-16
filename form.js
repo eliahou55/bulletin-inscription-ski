@@ -12,7 +12,7 @@ const CONFIG = {
 const PRICES = {
     adulte: 1500,
     enfant: 1000,          // tarif enfant réduit (appliqué une fois le minimum de la chambre couvert)
-    bebe: 450,
+    bebe: 500,
     locationAdulte: 150,   // location de matériel de ski / semaine
     locationEnfant: 100,
     coursSki6h: 350,       // cours de ski enfant, 6h/jour
