@@ -142,7 +142,7 @@ function buildOrganizerEmail(data, finalTotal) {
         detail += ' - chambre ' + (m.chambreNumero || 1);
         if (m.categorie === 'enfant') {
             if (m.tarifPromu) detail += ' - tarif adulte (chambre)';
-            if (m.coursSki) detail += ' - cours ' + (m.niveau || '') + ' (' + m.duree + '/j)';
+            if (m.coursSki) detail += ' - cours ' + (m.age ? m.age + ' ans, ' : '') + (m.niveau || '') + ' (' + m.duree + '/j)';
             if (m.locationSki) detail += ' - location ski';
         } else if (m.categorie === 'adulte' && m.locationSki) {
             detail += ' - location ski';
@@ -202,6 +202,10 @@ function buildOrganizerEmail(data, finalTotal) {
           <tr>
             <td style="border:1px solid #ddd;">Taxe de séjour / Caution</td>
             <td style="border:1px solid #ddd;">${data.taxeSejourEUR}€ / ${data.cautionEUR}€ par chambre</td>
+          </tr>
+          <tr style="background:#e7f4fb;">
+            <td style="border:1px solid #ddd;"><strong>Chambres réservées</strong></td>
+            <td style="border:1px solid #ddd;">${data.nombreChambresReservees || 0}</td>
           </tr>
         </table>
 

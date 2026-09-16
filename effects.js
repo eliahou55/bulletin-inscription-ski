@@ -31,7 +31,7 @@ function initCarousels() {
 
 // ----- Apparition au scroll -----
 function initRevealOnScroll() {
-    const targets = document.querySelectorAll('.form-section, .gallery-section, .highlights-section, .next-stay-banner');
+    const targets = document.querySelectorAll('.form-section, .gallery-section, .highlights-section');
     targets.forEach(el => el.classList.add('reveal'));
 
     if (!('IntersectionObserver' in window)) {

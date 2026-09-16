@@ -1,6 +1,6 @@
 // Configuration
 const CONFIG = {
-    GOOGLE_APPS_SCRIPT_URL: 'YOUR_GOOGLE_APPS_SCRIPT_URL_HERE',
+    GOOGLE_APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbz0OWt4YlLLGOWdVZgIIdidXfcLylocvBFFX5R_Nru5eTsBdH5tOcSs5gJepSW0KJE/exec',
     EMAIL_SERVICE_URL: 'https://loisirel-ski.netlify.app/.netlify/functions',
 };
 
@@ -31,6 +31,11 @@ const NIVEAUX_SKI = [
     '1ère étoile', '2ème étoile', '3ème étoile',
     'Étoile de bronze', "Étoile d'argent", "Étoile d'or"
 ];
+
+// Les cours de ski ne sont proposés qu'aux 4-12 ans ; en dessous, les enfants
+// sont pris en charge par le Mini/Baby Club plutôt que par un cours formel.
+const AGE_COURS_MIN = 4;
+const AGE_COURS_MAX = 12;
 
 // État du formulaire
 let familyMemberCount = 4;
@@ -117,6 +122,14 @@ function addFamilyRow(shouldCalculate = true) {
             NIVEAUX_SKI.map(n => `<option value="${n}">${n}</option>`).join('');
     }
 
+    function ageOptionsHTML() {
+        let html = '<option value="">Sélectionner...</option>';
+        for (let a = AGE_COURS_MIN; a <= AGE_COURS_MAX; a++) {
+            html += `<option value="${a}">${a} ans</option>`;
+        }
+        return html;
+    }
+
     function renderOptions(type) {
         if (type === 'adulte') {
             optionsContainer.innerHTML = `
@@ -126,6 +139,11 @@ function addFamilyRow(shouldCalculate = true) {
             optionsContainer.innerHTML = `
                 <label class="option-check"><input type="checkbox" class="opt-cours-ski"> Cours de ski souhaité</label>
                 <div class="opt-cours-details" style="display:none;">
+                    <p class="section-info" style="margin:0 0 4px;">Cours réservés aux ${AGE_COURS_MIN}-${AGE_COURS_MAX} ans — en dessous de ${AGE_COURS_MIN} ans, les enfants sont pris en charge par le Mini/Baby Club (9h30-12h / 14h-17h30).</p>
+                    <div class="form-group" style="margin-bottom:0;">
+                        <label>Âge de l'enfant</label>
+                        <select class="opt-age">${ageOptionsHTML()}</select>
+                    </div>
                     <div class="form-group" style="margin-bottom:0;">
                         <label>Niveau</label>
                         <select class="opt-niveau">${niveauOptionsHTML()}</select>
@@ -381,8 +399,10 @@ function getFamilyMembers() {
                 const cours = opts.querySelector('.opt-cours-ski');
                 member.coursSki = !!(cours && cours.checked);
                 if (member.coursSki) {
+                    const age = opts.querySelector('.opt-age');
                     const niveau = opts.querySelector('.opt-niveau');
                     const duree = opts.querySelector('.opt-duree:checked');
+                    member.age = age ? age.value : '';
                     member.niveau = niveau ? niveau.value : '';
                     member.duree = duree ? duree.value : '6h';
                 }
@@ -711,6 +731,15 @@ function calculateTotal() {
         recapSupplementRow.style.display = 'none';
     }
 
+    // Nombre total de chambres réservées
+    const recapRoomsCountRow = document.getElementById('recapRoomsCountRow');
+    if (errors.length === 0 && roomSummaries.length > 0) {
+        recapRoomsCountRow.style.display = '';
+        document.getElementById('recapRoomsCount').textContent = roomSummaries.length;
+    } else {
+        recapRoomsCountRow.style.display = 'none';
+    }
+
     // Bloquer la soumission tant qu'une chambre est invalide
     document.querySelector('.btn-submit').disabled = errors.length > 0;
 
@@ -802,6 +831,8 @@ function validateForm() {
 }
 
 function getFormData() {
+    const { roomSummaries } = computeRoomAssignments();
+
     let tarifAdulte = 0, tarifEnfant = 0, tarifBebe = 0, tarifOptions = 0;
     let countAdulte = 0, countEnfant = 0, countBebe = 0;
 
@@ -849,6 +880,23 @@ function getFormData() {
         tarifOptions: tarifOptions,
         tarifChambresOptimal: optimalCost,
         supplementChambres: supplementChambres,
+        nombreChambresReservees: roomSummaries.length,
+        chambresDetail: roomSummaries.map(r => ({
+            numero: r.roomNumber,
+            adultes: r.adults,
+            enfants: r.enfants,
+            bebes: r.bebes,
+            promus: r.promoted,
+            total: r.total
+        })),
+        chambresDetailJSON: JSON.stringify(roomSummaries.map(r => ({
+            numero: r.roomNumber,
+            adultes: r.adults,
+            enfants: r.enfants,
+            bebes: r.bebes,
+            promus: r.promoted,
+            total: r.total
+        }))),
         roomsOrganisateur: getOrganizerRooms(),
         notes: document.getElementById('notes').value.trim() || '',
         paiementIntegral: document.getElementById('paiementIntegral').checked,
@@ -1008,7 +1056,7 @@ function generateDevisPDF(formData, download = true) {
             info += ' - chambre ' + (m.chambreNumero || 1);
             if (m.categorie === 'enfant') {
                 if (m.tarifPromu) info += ' - tarif adulte (chambre)';
-                if (m.coursSki) info += ' - cours de ski ' + (m.niveau || '') + ' (' + m.duree + '/jour)';
+                if (m.coursSki) info += ' - cours de ski ' + (m.age ? m.age + ' ans, ' : '') + (m.niveau || '') + ' (' + m.duree + '/jour)';
                 if (m.locationSki) info += ' - location ski';
             } else if (m.categorie === 'adulte' && m.locationSki) {
                 info += ' - location ski';
@@ -1040,6 +1088,23 @@ function generateDevisPDF(formData, download = true) {
         doc.text('Supplément choix de chambres séparées : +' + formData.supplementChambres + '€', 10, y); y += 5;
     }
     y += 4;
+
+    // ── RÉPARTITION PAR CHAMBRE ────────────────────────────────
+    if (formData.chambresDetail && formData.chambresDetail.length > 0) {
+        sectionHead('RÉPARTITION PAR CHAMBRE (' + formData.nombreChambresReservees + ' chambre' + (formData.nombreChambresReservees > 1 ? 's' : '') + ' réservée' + (formData.nombreChambresReservees > 1 ? 's' : '') + ')');
+        doc.setFontSize(8.5);
+        formData.chambresDetail.forEach(c => {
+            checkBreak(5);
+            let line = 'Chambre ' + c.numero + ' : ' + c.adultes + ' adulte(s)';
+            if (c.enfants > 0) {
+                line += ' + ' + c.enfants + ' enfant(s)' + (c.promus > 0 ? ' (dont ' + c.promus + ' au tarif adulte)' : '');
+            }
+            if (c.bebes > 0) line += ' + ' + c.bebes + ' bébé(s)';
+            line += ' = ' + c.total + '€';
+            doc.text(line, 10, y); y += 5;
+        });
+        y += 3;
+    }
 
     // ── NOTES ────────────────────────────────────────────────
     if (formData.notes) {
@@ -1118,7 +1183,8 @@ function generateDevisPDF(formData, download = true) {
     // ── FRAIS COMPLÉMENTAIRES ─────────────────────────────────
     sectionHead('FRAIS COMPLÉMENTAIRES (non inclus dans le total)');
     doc.setFontSize(8.5);
-    doc.text('Caution : ' + formData.cautionEUR + '€ par chambre (remboursable)', 10, y); y += 5;
+    doc.text('Nombre de chambres réservées : ' + (formData.nombreChambresReservees || 0), 10, y); y += 5;
+    doc.text('Caution : ' + formData.cautionEUR + '€ par chambre (remboursable), soit ' + ((formData.cautionEUR || 0) * (formData.nombreChambresReservees || 0)) + '€ au total', 10, y); y += 5;
     doc.text('Taxe de séjour : ' + formData.taxeSejourEUR + '€ (' + formData.chambresAdultes + ' adulte(s) x ' + PRICES.taxeSejourParAdulte + '€), payable sur place', 10, y); y += 5;
     doc.text('Skipass à acheter sur place ou en ligne (non inclus)', 10, y); y += 8;
 

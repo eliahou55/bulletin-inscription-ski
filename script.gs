@@ -1,10 +1,18 @@
 // ============================================================
 // GOOGLE APPS SCRIPT - SKI 2026 (BARDONECCHIA)
 // ============================================================
+// Écrit dans 4 feuilles séparées à chaque inscription :
+//   - "Inscriptions"  : vue générale / tarification (une ligne par inscription)
+//   - "Cours de Ski"  : une ligne par enfant ayant demandé un cours de ski
+//   - "Locations"     : une ligne par personne ayant loué du matériel de ski
+//   - "Chambres"      : une ligne par chambre réservée dans l'inscription
 
 const SHEET_INSCRIPTIONS = "Inscriptions";
+const SHEET_COURS_SKI = "Cours de Ski";
+const SHEET_LOCATIONS = "Locations";
+const SHEET_CHAMBRES = "Chambres";
 
-// ---- Headers (doivent correspondre exactement aux colonnes du Sheet) ----
+// ---- Headers (doivent correspondre exactement aux colonnes de chaque feuille) ----
 
 const HEADERS_INSCRIPTIONS = [
   "ID Inscription", "Date Soumission",
@@ -14,6 +22,7 @@ const HEADERS_INSCRIPTIONS = [
   "Tarif Total Adultes", "Tarif Total Enfants", "Tarif Bébés",
   "Tarif Options Ski (location/cours)",
   "Tarif Optimal Chambres (€)", "Supplément Chambres Séparées (€)",
+  "Nombre de Chambres Réservées",
   "Notes",
   "Reduction (€)",
   "Total", "Acompte", "Solde Restant",
@@ -21,6 +30,21 @@ const HEADERS_INSCRIPTIONS = [
   "Paiement Intégral",
   "Taxe de Séjour (€)", "Caution par Chambre (€)",
   "Chambre Double", "Chambre Familiale", "Suite", "Chalet"
+];
+
+const HEADERS_COURS_SKI = [
+  "ID Inscription", "Date Soumission", "Nom Contact", "Prenom Contact",
+  "Nom Enfant", "Prenom Enfant", "Âge", "Niveau", "Durée", "Tarif Cours (€)"
+];
+
+const HEADERS_LOCATIONS = [
+  "ID Inscription", "Date Soumission", "Nom Contact", "Prenom Contact",
+  "Nom Personne", "Prenom Personne", "Catégorie", "Tarif Location (€)"
+];
+
+const HEADERS_CHAMBRES = [
+  "ID Inscription", "Date Soumission", "Nom Contact", "Prenom Contact",
+  "N° Chambre", "Adultes", "Enfants", "Enfants au tarif adulte", "Bébés", "Total Chambre (€)"
 ];
 
 // ============================================================
@@ -61,17 +85,24 @@ function addDataToSheets(data) {
   try {
     const spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
     const color = generateRandomColor();
+    const dateSoumission = data.dateSoumission || new Date().toLocaleDateString('fr-FR');
 
-    // Générer l'ID unique
-    const sheet1 = getOrCreateSheet(spreadsheet, SHEET_INSCRIPTIONS, HEADERS_INSCRIPTIONS);
-    const inscriptionId = 'SKI-2026-' + (sheet1.getLastRow());
+    // ---- Feuille générale "Inscriptions" ----
+    const sheetInscriptions = getOrCreateSheet(spreadsheet, SHEET_INSCRIPTIONS, HEADERS_INSCRIPTIONS);
+    const inscriptionId = 'SKI-2026-' + (sheetInscriptions.getLastRow());
 
-    // Récupérer les membres de la famille
     let membres = [];
     try {
       membres = JSON.parse(data.familleJSON || '[]');
-    } catch(e) {
+    } catch (e) {
       membres = [];
+    }
+
+    let chambresDetail = [];
+    try {
+      chambresDetail = JSON.parse(data.chambresDetailJSON || '[]');
+    } catch (e) {
+      chambresDetail = [];
     }
 
     const membresTexte = membres.map(m => {
@@ -79,7 +110,7 @@ function addDataToSheets(data) {
       info += ' [chambre ' + (m.chambreNumero || 1) + ']';
       if (m.categorie === 'enfant') {
         if (m.tarifPromu) info += ' [tarif adulte - chambre]';
-        if (m.coursSki) info += ' [cours ski ' + (m.niveau || '') + ' - ' + m.duree + '/j]';
+        if (m.coursSki) info += ' [cours ski ' + (m.age ? m.age + ' ans, ' : '') + (m.niveau || '') + ' - ' + m.duree + '/j]';
         if (m.locationSki) info += ' [location ski]';
       } else if (m.categorie === 'adulte' && m.locationSki) {
         info += ' [location ski]';
@@ -92,7 +123,7 @@ function addDataToSheets(data) {
 
     const rowInscription = [
       inscriptionId,
-      data.dateSoumission || new Date().toLocaleDateString('fr-FR'),
+      dateSoumission,
       data.nomContact,
       data.prenomContact,
       data.portable || '',
@@ -108,6 +139,7 @@ function addDataToSheets(data) {
       data.tarifOptions || 0,
       data.tarifChambresOptimal || 0,
       data.supplementChambres || 0,
+      data.nombreChambresReservees || chambresDetail.length || 0,
       data.notes || '',
       (data.remiseAppliquee === 'Oui' && data.remiseAmount > 0) ? (data.totalEUR - data.remiseAmount) : 0,
       finalTotal || 0,
@@ -124,8 +156,48 @@ function addDataToSheets(data) {
       rooms.chalet || 0
     ];
 
-    sheet1.appendRow(rowInscription);
-    coloriserLigne(sheet1, sheet1.getLastRow(), color);
+    sheetInscriptions.appendRow(rowInscription);
+    coloriserLigne(sheetInscriptions, sheetInscriptions.getLastRow(), color);
+
+    // ---- Feuille "Cours de Ski" : une ligne par enfant inscrit à un cours ----
+    const enfantsAvecCours = membres.filter(m => m.categorie === 'enfant' && m.coursSki);
+    if (enfantsAvecCours.length > 0) {
+      const sheetCours = getOrCreateSheet(spreadsheet, SHEET_COURS_SKI, HEADERS_COURS_SKI);
+      enfantsAvecCours.forEach(m => {
+        const tarifCours = m.duree === '3h' ? 250 : 350;
+        sheetCours.appendRow([
+          inscriptionId, dateSoumission, data.nomContact, data.prenomContact,
+          m.nom, m.prenom, m.age || '', m.niveau || '', m.duree || '', tarifCours
+        ]);
+        coloriserLigne(sheetCours, sheetCours.getLastRow(), color);
+      });
+    }
+
+    // ---- Feuille "Locations" : une ligne par personne ayant loué du matériel ----
+    const personnesAvecLocation = membres.filter(m => m.locationSki);
+    if (personnesAvecLocation.length > 0) {
+      const sheetLocations = getOrCreateSheet(spreadsheet, SHEET_LOCATIONS, HEADERS_LOCATIONS);
+      personnesAvecLocation.forEach(m => {
+        const tarifLocation = m.categorie === 'adulte' ? 150 : 100;
+        sheetLocations.appendRow([
+          inscriptionId, dateSoumission, data.nomContact, data.prenomContact,
+          m.nom, m.prenom, m.categorie, tarifLocation
+        ]);
+        coloriserLigne(sheetLocations, sheetLocations.getLastRow(), color);
+      });
+    }
+
+    // ---- Feuille "Chambres" : une ligne par chambre réservée ----
+    if (chambresDetail.length > 0) {
+      const sheetChambres = getOrCreateSheet(spreadsheet, SHEET_CHAMBRES, HEADERS_CHAMBRES);
+      chambresDetail.forEach(c => {
+        sheetChambres.appendRow([
+          inscriptionId, dateSoumission, data.nomContact, data.prenomContact,
+          c.numero, c.adultes || 0, c.enfants || 0, c.promus || 0, c.bebes || 0, c.total || 0
+        ]);
+        coloriserLigne(sheetChambres, sheetChambres.getLastRow(), color);
+      });
+    }
 
     Logger.log('Inscription enregistrée: ' + inscriptionId + ' - ' + data.nomContact + ' ' + data.prenomContact);
 
@@ -181,7 +253,8 @@ function testDoPost() {
     prenomContact: 'David',
     portable: '0612345678',
     emailContact: 'david.cohen@example.com',
-    familleJSON: '[{"nom":"Cohen","prenom":"David","categorie":"adulte","chambreNumero":1,"locationSki":true,"tarif":1650},{"nom":"Cohen","prenom":"Sarah","categorie":"adulte","chambreNumero":1,"locationSki":false,"tarif":1500},{"nom":"Cohen","prenom":"Tom","categorie":"enfant","chambreNumero":1,"tarifPromu":false,"coursSki":true,"niveau":"Flocon","duree":"6h","locationSki":true,"tarif":1450},{"nom":"Cohen","prenom":"Leia","categorie":"bebe","chambreNumero":1,"tarif":450}]',
+    familleJSON: '[{"nom":"Cohen","prenom":"David","categorie":"adulte","chambreNumero":1,"locationSki":true,"tarif":1650},{"nom":"Cohen","prenom":"Sarah","categorie":"adulte","chambreNumero":1,"locationSki":false,"tarif":1500},{"nom":"Cohen","prenom":"Tom","categorie":"enfant","chambreNumero":1,"tarifPromu":false,"coursSki":true,"age":"8","niveau":"Flocon","duree":"6h","locationSki":true,"tarif":1450},{"nom":"Cohen","prenom":"Leia","categorie":"bebe","chambreNumero":1,"tarif":450}]',
+    chambresDetailJSON: '[{"numero":1,"adultes":2,"enfants":1,"bebes":1,"promus":0,"total":4000}]',
     chambresAdultes: 2,
     chambresEnfants: 1,
     bebes: 1,
@@ -189,6 +262,9 @@ function testDoPost() {
     tarifChambresEnfants: 1000,
     tarifBebes: 450,
     tarifOptions: 600,
+    tarifChambresOptimal: 4000,
+    supplementChambres: 0,
+    nombreChambresReservees: 1,
     notes: 'Régime casher strict',
     remiseAppliquee: 'Non',
     remiseAmount: 0,

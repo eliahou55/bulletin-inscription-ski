@@ -783,6 +783,27 @@ header p {
         box-shadow: 0 1px 4px rgba(0,0,0,0.08);
     }
 
+    /* La ligne d'options (cours de ski, location) est un simple bloc pleine
+       largeur — elle ne doit pas hériter de la grille 2 colonnes ci-dessus. */
+    .family-table tbody tr.family-options-row {
+        display: block;
+        margin-top: -10px;
+        margin-bottom: 10px;
+        padding: 0 10px 10px;
+        border: 1px solid var(--border-color);
+        border-top: none;
+        border-radius: 0 0 8px 8px;
+        background: white;
+        box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    }
+
+    .family-table tbody tr.family-options-row td {
+        display: block;
+        width: 100%;
+        padding: 0;
+        border: none;
+    }
+
     /* Nom → colonne 1 */
     .family-table td:nth-child(1) {
         grid-column: 1;
@@ -2113,14 +2134,6 @@ footer p {
     border-radius: 14px;
 }
 
-.highlights-title {
-    color: var(--primary-color);
-    font-size: 1.3em;
-    font-weight: 700;
-    margin-bottom: 18px;
-    text-align: center;
-}
-
 .highlights-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -2167,26 +2180,6 @@ footer p {
 }
 
 /* ===== BANNIÈRE SÉJOUR 2027 ===== */
-.next-stay-banner {
-    margin: 0 30px 30px;
-    padding: 16px 22px;
-    background: rgba(255, 248, 240, 0.88);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 140, 58, 0.5);
-    border-left: 4px solid var(--accent-color);
-    border-radius: 12px;
-    text-align: center;
-    font-size: 0.95em;
-    color: #7a3d0a;
-}
-
-@media (max-width: 768px) {
-    .next-stay-banner {
-        margin: 0 15px 20px;
-    }
-}
-
 /* ===== OPTIONS PAR MEMBRE (ski, chambre) ===== */
 .family-options-row td {
     border-bottom: 1px solid var(--border-color);
@@ -2216,15 +2209,16 @@ footer p {
 .option-radio,
 .option-check {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     gap: 6px;
     cursor: pointer;
     font-size: 0.92em;
-    white-space: nowrap;
 }
 
 .option-radio input,
 .option-check input {
+    margin-top: 3px;
+    flex-shrink: 0;
     cursor: pointer;
     accent-color: var(--secondary-color);
 }
