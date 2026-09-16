@@ -1,0 +1,5 @@
+# Fonction /send-email : nécessite les variables d'environnement RESEND_API_KEY,
+# FROM_EMAIL et ORGANIZER_EMAIL (Site configuration > Environment variables, scope "Functions").
+[functions]
+  directory = "backend/netlify/functions"
+  node_bundler = "esbuild"

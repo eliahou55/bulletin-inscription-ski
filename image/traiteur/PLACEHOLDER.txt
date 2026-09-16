@@ -1,0 +1,7 @@
+Dépose ici les photos du traiteur (buffets, plats, dressage, etc.).
+Formats acceptés : .jpg, .jpeg, .png, .webp
+
+Une fois les photos ajoutées, préviens-moi (Claude) et j'ajouterai automatiquement
+le carrousel "Notre Traiteur" sur la page d'inscription, comme pour le projet Souccot.
+
+Ce fichier peut être supprimé une fois les vraies photos ajoutées.

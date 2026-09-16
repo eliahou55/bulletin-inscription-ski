@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bulletin d'Inscription - Ski 2026 Hôtel Savoia Resort Bardonecchia</title>
+    <link rel="icon" type="image/png" href="logo.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo-wrap">
+                <img src="logo.png" alt="Loisirel Club Vacances" class="logo-img">
+            </div>
+            <h1>LOISIREL SKI 2026</h1>
+            <h2>HÔTEL SAVOIA RESORT **** — BARDONECCHIA, ITALIE</h2>
+            <p class="hero-greeting">
+                <span class="greeting-main">✨ Se détendre, c'est l'essentiel</span>
+            </p>
+            <p class="subtitle">Bulletin d'Inscription - Séjour au Ski</p>
+            <p class="dates">Du dimanche 22 février au dimanche 1er mars 2026</p>
+            <p class="hotel">Hôtel Savoia Resort **** - Bardonecchia, Italie (1 800 m d'altitude, au pied des pistes)</p>
+            <p class="pension-badge">Séjour en PENSION COMPLÈTE GASTRONOMIQUE GLATT CACHER</p>
+            <p class="supervision-line">Sous la supervision du Dayan Rav Ephraïm Cremisi</p>
+        </header>
+
+        <section class="highlights-section reveal">
+            <h3 class="highlights-title">Pourquoi partir avec Loisirel</h3>
+            <div class="highlights-grid">
+                <div class="highlight-card">
+                    <span class="highlight-icon">🎿</span>
+                    <p>Domaine et pistes d'exception : <strong>21 bleues, 18 rouges, 5 noires</strong></p>
+                </div>
+                <div class="highlight-card">
+                    <span class="highlight-icon">🏨</span>
+                    <p>Hébergement haut de gamme : <strong>suites & chalets</strong>, chambres spacieuses, rénovées et lumineuses</p>
+                </div>
+                <div class="highlight-card">
+                    <span class="highlight-icon">✡️</span>
+                    <p>Sous la supervision du <strong>Dayan Rav Ephraïm Cremisi</strong></p>
+                </div>
+                <div class="highlight-card">
+                    <span class="highlight-icon">💆</span>
+                    <p>Bien-être : <strong>spa, sauna, piscine, fitness</strong>, piscine SPA et espace massage</p>
+                </div>
+                <div class="highlight-card">
+                    <span class="highlight-icon">👨‍👩‍👧‍👦</span>
+                    <p>Activités famille : <strong>ski enfants, baby-club (9h30-12h / 14h-17h30), soirées</strong></p>
+                </div>
+                <div class="highlight-card">
+                    <span class="highlight-icon">🎶</span>
+                    <p>Animation jeux tous les soirs par <strong>Vip Orchestra</strong></p>
+                </div>
+            </div>
+            <p class="section-info highlights-note">Pension complète gastronomique et généreuse glatt cacher · Baby et mini club tous les jours de 9h à 12h et de 14h à 17h</p>
+        </section>
+
+        <section class="next-stay-banner reveal">
+            <p><strong>Déjà envie de repartir ?</strong> Séjour 2027 : du 14 au 21 février 2027 (7 nuits / 8 jours) — à partir de <strong>1 500 €</strong>. Renseignez-vous auprès de l'organisateur.</p>
+        </section>
+
+        <form id="inscriptionForm" class="form-container">
+            <!-- Section 1: Informations de Contact -->
+            <section class="form-section contact-section">
+                <h3>Informations de Contact</h3>
+
+                <div class="contact-grid">
+                    <div class="form-group">
+                        <label for="nomContact">Nom *</label>
+                        <input type="text" id="nomContact" name="nomContact" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="prenomContact">Prénom *</label>
+                        <input type="text" id="prenomContact" name="prenomContact" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="portable">Téléphone</label>
+                        <input type="tel" id="portable" name="portable">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="emailContact">Email *</label>
+                        <input type="email" id="emailContact" name="emailContact" placeholder="exemple@gmail.com" required>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 2: Membres de la Famille -->
+            <section class="form-section">
+                <h3>Membres de la Famille</h3>
+                <p class="section-info">Saisissez les informations de chaque membre et sélectionnez sa catégorie - des options adaptées (ski, chambre) apparaîtront selon la catégorie choisie</p>
+
+                <div id="familyTableWrapper" class="family-table-wrapper">
+                    <table class="family-table">
+                        <thead>
+                            <tr>
+                                <th>Nom</th>
+                                <th>Prénom</th>
+                                <th>Catégorie</th>
+                                <th>Tarif</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="familyTableBody">
+                            <!-- Les lignes seront ajoutées par JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <button type="button" id="addMemberBtn" class="btn-add-member">+ Ajouter un membre</button>
+            </section>
+
+            <!-- Section 3: Notes -->
+            <section class="form-section">
+                <h3>Notes</h3>
+                <div class="form-group">
+                    <label for="notes">Notes additionnelles</label>
+                    <textarea id="notes" name="notes" rows="4" placeholder="Laissez vos remarques ou demandes spéciales..."></textarea>
+                </div>
+            </section>
+
+            <section class="form-section recap-section">
+                <h3>Récapitulatif du Devis</h3>
+
+                <div class="recap-container">
+                    <div class="recap-item">
+                        <span id="recapAdulteLabel">Adultes:</span>
+                        <span id="recapAdulte">0€</span>
+                    </div>
+                    <div class="recap-item">
+                        <span id="recapEnfantLabel">Enfants:</span>
+                        <span id="recapEnfant">0€</span>
+                    </div>
+                    <div class="recap-item">
+                        <span id="recapBebeLabel">Bébés:</span>
+                        <span id="recapBebe">0€</span>
+                    </div>
+                    <div class="recap-item" id="recapOptionsRow" style="display:none;">
+                        <span id="recapOptionsLabel">Options ski:</span>
+                        <span id="recapOptions">0€</span>
+                    </div>
+                    <div class="recap-divider"></div>
+                    <div class="recap-item total">
+                        <span>TOTAL:</span>
+                        <span id="recapTotal">0€</span>
+                    </div>
+                    <div class="recap-item" id="recapRemise" style="display: none; color: #27ae60; font-weight: 600;"></div>
+
+                    <!-- Paiement intégral -->
+                    <div class="recap-item" style="margin-top:6px;">
+                        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-weight:600;">
+                            <input type="checkbox" id="paiementIntegral" style="width:16px;height:16px;cursor:pointer;">
+                            <span style="color:#0b5f8a;">✅ Total réglé en intégralité</span>
+                        </label>
+                    </div>
+
+                    <div id="recapAcompteRow" class="recap-item">
+                        <span>Acompte à la réservation:</span>
+                        <span id="recapAcompte">0€</span>
+                    </div>
+                    <div id="recapSoldeRow" class="recap-item info">
+                        <span>Solde:</span>
+                        <span id="recapSolde">0€</span>
+                    </div>
+                    <div id="recapRegleRow" class="recap-item" style="display:none;">
+                        <span style="color:#0b5f8a;font-weight:700;">TOTAL RÉGLÉ :</span>
+                        <span id="recapRegle" style="color:#0b5f8a;font-weight:700;">0€</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 6: Conditions -->
+            <section class="form-section conditions">
+                <h3>Conditions Générales</h3>
+                <div class="conditions-text">
+                    <p>✓ Chambres disponibles le dimanche à partir de 14h00.</p>
+                    <p>✓ Acompte de 1 500 € à la réservation.</p>
+                    <p>✓ Caution de 100 € par chambre (remboursable).</p>
+                    <p>✓ Taxe d'hébergement de 10 € par adulte (+12 ans), payable sur place.</p>
+                    <p>✓ Skipass à acheter sur place ou en ligne (non inclus).</p>
+                    <p>✓ Adhésion TOVEL incluse.</p>
+                </div>
+            </section>
+
+            <!-- Section 7: Espace Organisateur (verrouillé par code) -->
+            <section class="form-section organizer-section">
+                <h3 class="organizer-warning">⚠️ À NE REMPLIR QUE PAR L'ORGANISATEUR</h3>
+
+                <button type="button" id="organizerToggleBtn" class="organizer-toggle-btn">
+                    🔒 Espace organisateur — cliquer pour ouvrir
+                </button>
+
+                <div id="organizerContent" class="organizer-content" style="display:none;">
+                    <div id="organizerLocked" class="organizer-lock">
+                        <p class="section-info">Section verrouillée — saisir le code</p>
+                        <div class="pin-dots">
+                            <span class="pin-dot" data-dot="0"></span>
+                            <span class="pin-dot" data-dot="1"></span>
+                            <span class="pin-dot" data-dot="2"></span>
+                            <span class="pin-dot" data-dot="3"></span>
+                        </div>
+                        <div class="pin-keypad">
+                            <button type="button" class="pin-key" data-digit="1">1</button>
+                            <button type="button" class="pin-key" data-digit="2">2</button>
+                            <button type="button" class="pin-key" data-digit="3">3</button>
+                            <button type="button" class="pin-key" data-digit="4">4</button>
+                            <button type="button" class="pin-key" data-digit="5">5</button>
+                            <button type="button" class="pin-key" data-digit="6">6</button>
+                            <button type="button" class="pin-key" data-digit="7">7</button>
+                            <button type="button" class="pin-key" data-digit="8">8</button>
+                            <button type="button" class="pin-key" data-digit="9">9</button>
+                            <button type="button" class="pin-key pin-key-clear" id="pinClear">C</button>
+                            <button type="button" class="pin-key" data-digit="0">0</button>
+                            <button type="button" class="pin-key pin-key-back" id="pinBack">⌫</button>
+                        </div>
+                        <p id="pinError" class="pin-error" style="display:none;">Code incorrect</p>
+                    </div>
+
+                    <div id="organizerUnlocked" style="display:none;">
+                        <div class="remise-section organizer-remise">
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="remiseCheck" name="remiseCheck">
+                                <label for="remiseCheck">Appliquer une remise ou prix spécial</label>
+                            </div>
+
+                            <div id="remiseOptions" style="display: none; margin-top: 15px;">
+                                <div class="form-group">
+                                    <label for="remiseAmount">Prix après remise (€)</label>
+                                    <input type="number" id="remiseAmount" name="remiseAmount" placeholder="Ex: 1000" min="0" disabled>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="rooms-grid">
+                            <div class="room-selector">
+                                <div class="room-header"><h4>Chambre Double</h4></div>
+                                <div class="room-input-group">
+                                    <button type="button" class="btn-minus" data-room="double">−</button>
+                                    <input type="number" id="roomDouble" value="0" min="0" class="room-input" readonly>
+                                    <button type="button" class="btn-plus" data-room="double">+</button>
+                                </div>
+                            </div>
+                            <div class="room-selector">
+                                <div class="room-header"><h4>Chambre Familiale</h4></div>
+                                <div class="room-input-group">
+                                    <button type="button" class="btn-minus" data-room="familiale">−</button>
+                                    <input type="number" id="roomFamiliale" value="0" min="0" class="room-input" readonly>
+                                    <button type="button" class="btn-plus" data-room="familiale">+</button>
+                                </div>
+                            </div>
+                            <div class="room-selector">
+                                <div class="room-header"><h4>Suite</h4></div>
+                                <div class="room-input-group">
+                                    <button type="button" class="btn-minus" data-room="suite">−</button>
+                                    <input type="number" id="roomSuite" value="0" min="0" class="room-input" readonly>
+                                    <button type="button" class="btn-plus" data-room="suite">+</button>
+                                </div>
+                            </div>
+                            <div class="room-selector">
+                                <div class="room-header"><h4>Chalet</h4></div>
+                                <div class="room-input-group">
+                                    <button type="button" class="btn-minus" data-room="chalet">−</button>
+                                    <input type="number" id="roomChalet" value="0" min="0" class="room-input" readonly>
+                                    <button type="button" class="btn-plus" data-room="chalet">+</button>
+                                </div>
+                            </div>
+                            <p class="section-info" style="grid-column:1/-1;">Ces chambres sont informatives uniquement — elles n'affectent pas le prix du séjour.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Boutons -->
+            <div class="form-actions">
+                <button type="submit" class="btn-submit">Soumettre l'Inscription</button>
+                <button type="reset" class="btn-reset">Réinitialiser</button>
+            </div>
+
+            <!-- Message de statut -->
+            <div id="statusMessage" class="status-message"></div>
+        </form>
+
+        <footer>
+            <p>ADRESSE HÔTEL: Hôtel Savoia Resort ****</p>
+            <p>Bardonecchia, Italie (accès via aéroports de Turin ou Milan)</p>
+            <p><strong>Téléphone / WhatsApp : 06 12 20 28 61</strong></p>
+            <p>Email : loisirel@hotmail.fr — Site : www.loisirel.net</p>
+        </footer>
+    </div>
+
+    <div id="lightboxOverlay" class="lightbox-overlay">
+        <button type="button" id="lightboxClose" class="lightbox-close" aria-label="Fermer">&times;</button>
+        <button type="button" id="lightboxPrev" class="lightbox-nav lightbox-nav-prev" aria-label="Image précédente">‹</button>
+        <img id="lightboxImg" class="lightbox-img" src="" alt="">
+        <button type="button" id="lightboxNext" class="lightbox-nav lightbox-nav-next" aria-label="Image suivante">›</button>
+    </div>
+
+    <script src="logo-data.js"></script>
+    <script src="form.js"></script>
+    <script src="effects.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+</body>
+</html>
