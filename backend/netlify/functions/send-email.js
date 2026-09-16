@@ -107,8 +107,9 @@ function buildOrganizerHTML(data, finalTotal) {
     const CAT_LABELS = { adulte: 'Adulte', enfant: 'Enfant', bebe: 'Bébé' };
     const membresRows = membres.map((m, i) => {
         let detail = CAT_LABELS[m.categorie] || m.categorie || 'N/A';
+        detail += ' - chambre ' + (m.chambreNumero || 1);
         if (m.categorie === 'enfant') {
-            detail += m.chambre === 'separee' ? ' - chambre séparée' : ' - partage parents';
+            if (m.tarifPromu) detail += ' - tarif adulte (chambre)';
             if (m.coursSki) detail += ' - cours ' + (m.niveau || '') + ' (' + m.duree + '/j)';
             if (m.locationSki) detail += ' - location ski';
         } else if (m.categorie === 'adulte' && m.locationSki) {

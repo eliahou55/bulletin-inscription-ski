@@ -5,10 +5,13 @@ const CONFIG = {
 };
 
 // Tarifs (séjour Ski 2026 - Bardonecchia)
+// Logique chambre : chaque chambre doit rapporter un minimum de ROOM_MIN_REVENUE
+// et contenir entre ROOM_MIN_PEOPLE et ROOM_MAX_PEOPLE personnes (bébés exclus du calcul).
+// Si les adultes de la chambre ne couvrent pas le minimum, des enfants sont "promus"
+// au tarif adulte (un par un) jusqu'à ce que le minimum soit atteint.
 const PRICES = {
-    adulte: 1450,
-    enfantPartage: 1000,   // enfant 3-12 ans partageant la chambre des parents
-    enfantSepare: 1450,    // enfant en chambre double (comme un adulte)
+    adulte: 1500,
+    enfant: 1000,          // tarif enfant réduit (appliqué une fois le minimum de la chambre couvert)
     bebe: 450,
     locationAdulte: 150,   // location de matériel de ski / semaine
     locationEnfant: 100,
@@ -18,6 +21,10 @@ const PRICES = {
     cautionParChambre: 100,
     taxeSejourParAdulte: 10
 };
+
+const ROOM_MIN_REVENUE = 3000;
+const ROOM_MIN_PEOPLE = 2;
+const ROOM_MAX_PEOPLE = 4;
 
 const NIVEAUX_SKI = [
     'Piou-Piou', 'Ourson', 'Flocon',
@@ -69,6 +76,8 @@ function addFamilyRow(shouldCalculate = true) {
     row.dataset.type = '';
     row.dataset.baseTarif = '0';
     row.dataset.extraTarif = '0';
+    row.dataset.roomNumber = '1';
+    row.dataset.promoted = 'false';
     row.innerHTML = `
         <td><input type="text" class="family-nom" placeholder="Nom"></td>
         <td><input type="text" class="family-prenom" placeholder="Prénom"></td>
@@ -79,6 +88,7 @@ function addFamilyRow(shouldCalculate = true) {
                 <label class="type-radio-label"><input type="radio" class="member-type-radio" name="${radioName}" value="bebe"> Bébé</label>
             </div>
         </td>
+        <td><input type="number" class="member-room" min="1" max="20" value="1" title="Numéro de chambre"></td>
         <td><span class="family-tarif-display">-</span></td>
         <td>
             <button type="button" class="btn-delete-row" onclick="deleteFamilyRow(this)">Supprimer</button>
@@ -88,7 +98,7 @@ function addFamilyRow(shouldCalculate = true) {
     const optionsRow = document.createElement('tr');
     optionsRow.className = 'family-options-row';
     optionsRow.style.display = 'none';
-    optionsRow.innerHTML = `<td colspan="5"><div class="member-options"></div></td>`;
+    optionsRow.innerHTML = `<td colspan="6"><div class="member-options"></div></td>`;
 
     tableBody.appendChild(row);
     tableBody.appendChild(optionsRow);
@@ -99,7 +109,6 @@ function addFamilyRow(shouldCalculate = true) {
         lastAutoNom = contactNom;
     }
 
-    const tarifDisplay = row.querySelector('.family-tarif-display');
     const optionsContainer = optionsRow.querySelector('.member-options');
 
     function niveauOptionsHTML() {
@@ -114,11 +123,6 @@ function addFamilyRow(shouldCalculate = true) {
             `;
         } else if (type === 'enfant') {
             optionsContainer.innerHTML = `
-                <div class="option-group">
-                    <span class="option-label">Chambre :</span>
-                    <label class="option-radio"><input type="radio" name="chambre_${rowIndex}" class="opt-chambre" value="partagee" checked> Partage la chambre des parents (${PRICES.enfantPartage}€)</label>
-                    <label class="option-radio"><input type="radio" name="chambre_${rowIndex}" class="opt-chambre" value="separee"> Chambre séparée (${PRICES.enfantSepare}€)</label>
-                </div>
                 <label class="option-check"><input type="checkbox" class="opt-cours-ski"> Cours de ski souhaité</label>
                 <div class="opt-cours-details" style="display:none;">
                     <div class="form-group" style="margin-bottom:0;">
@@ -151,16 +155,6 @@ function addFamilyRow(shouldCalculate = true) {
         });
     }
 
-    function baseTarif(type) {
-        if (type === 'adulte') return PRICES.adulte;
-        if (type === 'bebe') return PRICES.bebe;
-        if (type === 'enfant') {
-            const chambre = optionsContainer.querySelector('.opt-chambre:checked');
-            return (chambre && chambre.value === 'separee') ? PRICES.enfantSepare : PRICES.enfantPartage;
-        }
-        return 0;
-    }
-
     function computeExtra(type) {
         let extra = 0;
         if (type === 'adulte') {
@@ -178,22 +172,14 @@ function addFamilyRow(shouldCalculate = true) {
         return extra;
     }
 
+    // Le tarif de base (adulte/enfant/bébé, avec promotion éventuelle au tarif
+    // adulte selon la composition de la chambre) est calculé globalement par
+    // computeRoomAssignments() car il dépend des autres membres de la même chambre.
     function updateDisplay() {
         const typeSelected = row.querySelector('.member-type-radio:checked');
-        if (typeSelected) {
-            const type = typeSelected.value;
-            const base = baseTarif(type);
-            const extra = computeExtra(type);
-            tarifDisplay.textContent = (base + extra) + '€';
-            row.dataset.type = type;
-            row.dataset.baseTarif = base;
-            row.dataset.extraTarif = extra;
-        } else {
-            tarifDisplay.textContent = '-';
-            row.dataset.type = '';
-            row.dataset.baseTarif = 0;
-            row.dataset.extraTarif = 0;
-        }
+        const type = typeSelected ? typeSelected.value : '';
+        row.dataset.type = type;
+        row.dataset.extraTarif = type ? computeExtra(type) : 0;
         calculateTotal();
     }
 
@@ -213,6 +199,11 @@ function addFamilyRow(shouldCalculate = true) {
             }
             updateDisplay();
         });
+    });
+
+    row.querySelector('.member-room').addEventListener('input', function() {
+        row.dataset.roomNumber = parseInt(this.value) || 1;
+        calculateTotal();
     });
 
     if (shouldCalculate) {
@@ -368,22 +359,24 @@ function getFamilyMembers() {
             nom: nom || '',
             prenom: prenom || '',
             categorie: categorie,
+            chambreNumero: parseInt(row.dataset.roomNumber) || 1,
             tarif: (parseInt(row.dataset.baseTarif) || 0) + (parseInt(row.dataset.extraTarif) || 0)
         };
 
-        if (categorie === 'enfant' && opts) {
-            const chambre = opts.querySelector('.opt-chambre:checked');
-            member.chambre = chambre ? chambre.value : 'partagee';
-            const cours = opts.querySelector('.opt-cours-ski');
-            member.coursSki = !!(cours && cours.checked);
-            if (member.coursSki) {
-                const niveau = opts.querySelector('.opt-niveau');
-                const duree = opts.querySelector('.opt-duree:checked');
-                member.niveau = niveau ? niveau.value : '';
-                member.duree = duree ? duree.value : '6h';
+        if (categorie === 'enfant') {
+            member.tarifPromu = row.dataset.promoted === 'true';
+            if (opts) {
+                const cours = opts.querySelector('.opt-cours-ski');
+                member.coursSki = !!(cours && cours.checked);
+                if (member.coursSki) {
+                    const niveau = opts.querySelector('.opt-niveau');
+                    const duree = opts.querySelector('.opt-duree:checked');
+                    member.niveau = niveau ? niveau.value : '';
+                    member.duree = duree ? duree.value : '6h';
+                }
+                const rental = opts.querySelector('.opt-ski-rental');
+                member.locationSki = !!(rental && rental.checked);
             }
-            const rental = opts.querySelector('.opt-ski-rental');
-            member.locationSki = !!(rental && rental.checked);
         } else if (categorie === 'adulte' && opts) {
             const rental = opts.querySelector('.opt-ski-rental');
             member.locationSki = !!(rental && rental.checked);
@@ -395,8 +388,138 @@ function getFamilyMembers() {
     return members;
 }
 
+// ===== RÉPARTITION PAR CHAMBRE =====
+// Chaque chambre doit contenir entre ROOM_MIN_PEOPLE et ROOM_MAX_PEOPLE personnes
+// (adultes + enfants ; les bébés ne comptent pas) et rapporter au moins
+// ROOM_MIN_REVENUE. Si les adultes de la chambre ne couvrent pas ce minimum,
+// des enfants sont promus au tarif adulte (un par un, dans l'ordre du tableau)
+// jusqu'à ce que le minimum soit atteint ; les enfants restants gardent le tarif réduit.
+function computeRoomAssignments() {
+    const rows = Array.from(document.querySelectorAll('#familyTableBody .family-row'));
+    const rooms = {};
+
+    rows.forEach(row => {
+        const roomInput = row.querySelector('.member-room');
+        const roomNumber = parseInt(roomInput.value) || 1;
+        row.dataset.roomNumber = roomNumber;
+
+        const type = row.dataset.type;
+        if (!type) return;
+
+        if (!rooms[roomNumber]) rooms[roomNumber] = { adults: [], enfants: [], bebes: [] };
+        if (type === 'adulte') rooms[roomNumber].adults.push(row);
+        else if (type === 'enfant') rooms[roomNumber].enfants.push(row);
+        else if (type === 'bebe') rooms[roomNumber].bebes.push(row);
+    });
+
+    const roomSummaries = [];
+    const errors = [];
+
+    Object.keys(rooms)
+        .map(Number)
+        .sort((a, b) => a - b)
+        .forEach(roomNumber => {
+            const group = rooms[roomNumber];
+            const peopleCount = group.adults.length + group.enfants.length;
+            let valid = true;
+            let issue = '';
+
+            if (peopleCount < ROOM_MIN_PEOPLE) {
+                valid = false;
+                issue = `${peopleCount} personne${peopleCount > 1 ? 's' : ''} seulement (minimum ${ROOM_MIN_PEOPLE}, bébés non comptés)`;
+            } else if (peopleCount > ROOM_MAX_PEOPLE) {
+                valid = false;
+                issue = `${peopleCount} personnes (maximum ${ROOM_MAX_PEOPLE}, bébés non comptés)`;
+            }
+
+            group.adults.forEach(row => {
+                row.dataset.baseTarif = PRICES.adulte;
+                row.dataset.promoted = 'false';
+            });
+
+            const adultsRevenue = group.adults.length * PRICES.adulte;
+            const remaining = Math.max(0, ROOM_MIN_REVENUE - adultsRevenue);
+            const promoteCount = valid ? Math.min(group.enfants.length, Math.ceil(remaining / PRICES.adulte)) : 0;
+
+            group.enfants.forEach((row, i) => {
+                const promoted = i < promoteCount;
+                row.dataset.baseTarif = promoted ? PRICES.adulte : PRICES.enfant;
+                row.dataset.promoted = promoted ? 'true' : 'false';
+            });
+
+            group.bebes.forEach(row => {
+                row.dataset.baseTarif = PRICES.bebe;
+                row.dataset.promoted = 'false';
+            });
+
+            const roomTotal = group.adults.length * PRICES.adulte
+                + group.enfants.reduce((sum, r) => sum + (parseInt(r.dataset.baseTarif) || 0), 0)
+                + group.bebes.length * PRICES.bebe;
+
+            roomSummaries.push({
+                roomNumber,
+                adults: group.adults.length,
+                enfants: group.enfants.length,
+                bebes: group.bebes.length,
+                promoted: promoteCount,
+                valid,
+                issue,
+                total: roomTotal
+            });
+
+            if (!valid) {
+                errors.push(`Chambre ${roomNumber} : ${issue}`);
+            }
+        });
+
+    // Rafraîchir l'affichage du tarif de chaque ligne
+    rows.forEach(row => {
+        const tarifDisplay = row.querySelector('.family-tarif-display');
+        if (!row.dataset.type) {
+            tarifDisplay.textContent = '-';
+            return;
+        }
+        const base = parseInt(row.dataset.baseTarif) || 0;
+        const extra = parseInt(row.dataset.extraTarif) || 0;
+        tarifDisplay.textContent = (base + extra) + '€';
+    });
+
+    return { roomSummaries, errors };
+}
+
+function renderRoomsBreakdown(roomSummaries, errors) {
+    const container = document.getElementById('roomsBreakdown');
+    if (!roomSummaries.length) {
+        container.innerHTML = '';
+        return;
+    }
+
+    const CAT_PLURAL = (n, s, p) => `${n} ${n > 1 ? p : s}`;
+
+    let html = '<div class="rooms-breakdown-list">';
+    roomSummaries.forEach(r => {
+        const parts = [];
+        if (r.adults > 0) parts.push(CAT_PLURAL(r.adults, 'adulte', 'adultes'));
+        if (r.enfants > 0) {
+            let enfantLabel = CAT_PLURAL(r.enfants, 'enfant', 'enfants');
+            if (r.promoted > 0) enfantLabel += ` (dont ${r.promoted} au tarif adulte)`;
+            parts.push(enfantLabel);
+        }
+        if (r.bebes > 0) parts.push(CAT_PLURAL(r.bebes, 'bébé', 'bébés'));
+
+        html += `<div class="room-summary-item${r.valid ? '' : ' room-summary-error'}">
+            <span>Chambre ${r.roomNumber} : ${parts.join(' + ') || 'vide'}</span>
+            <span>${r.valid ? formatPrice(r.total) : '⚠️ ' + r.issue}</span>
+        </div>`;
+    });
+    html += '</div>';
+    container.innerHTML = html;
+}
+
 // ===== CALCULS =====
 function calculateTotal() {
+    const { roomSummaries, errors } = computeRoomAssignments();
+
     let tarifAdulte = 0, tarifEnfant = 0, tarifBebe = 0, tarifOptions = 0;
     let countAdulte = 0, countEnfant = 0, countBebe = 0;
 
@@ -411,6 +534,8 @@ function calculateTotal() {
     });
 
     const total = tarifAdulte + tarifEnfant + tarifBebe + tarifOptions;
+
+    renderRoomsBreakdown(roomSummaries, errors);
 
     // Calculer la remise
     let remiseAmount = 0;
@@ -522,6 +647,12 @@ function validateForm() {
 
     if (!prenomContact) {
         showStatus('⚠️ Veuillez saisir votre prénom', 'error');
+        return false;
+    }
+
+    const { errors } = computeRoomAssignments();
+    if (errors.length > 0) {
+        showStatus('⚠️ Configuration de chambre invalide — ' + errors.join(' | '), 'error');
         return false;
     }
 
@@ -728,8 +859,9 @@ function generateDevisPDF(formData, download = true) {
         formData.familleMembers.forEach((m, i) => {
             checkBreak(5);
             let info = m.categorie ? ' (' + (CAT_LABELS[m.categorie] || m.categorie) + ')' : '';
+            info += ' - chambre ' + (m.chambreNumero || 1);
             if (m.categorie === 'enfant') {
-                info += m.chambre === 'separee' ? ' - chambre séparée' : ' - partage chambre parents';
+                if (m.tarifPromu) info += ' - tarif adulte (chambre)';
                 if (m.coursSki) info += ' - cours de ski ' + (m.niveau || '') + ' (' + m.duree + '/jour)';
                 if (m.locationSki) info += ' - location ski';
             } else if (m.categorie === 'adulte' && m.locationSki) {

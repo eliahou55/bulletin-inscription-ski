@@ -75,8 +75,9 @@ function addDataToSheets(data) {
 
     const membresTexte = membres.map(m => {
       let info = m.nom + ' ' + m.prenom + (m.categorie ? ' (' + m.categorie + ')' : '');
+      info += ' [chambre ' + (m.chambreNumero || 1) + ']';
       if (m.categorie === 'enfant') {
-        info += m.chambre === 'separee' ? ' [chambre séparée]' : ' [partage chambre parents]';
+        if (m.tarifPromu) info += ' [tarif adulte - chambre]';
         if (m.coursSki) info += ' [cours ski ' + (m.niveau || '') + ' - ' + m.duree + '/j]';
         if (m.locationSki) info += ' [location ski]';
       } else if (m.categorie === 'adulte' && m.locationSki) {
@@ -177,21 +178,21 @@ function testDoPost() {
     prenomContact: 'David',
     portable: '0612345678',
     emailContact: 'david.cohen@example.com',
-    familleJSON: '[{"nom":"Cohen","prenom":"David","categorie":"adulte","locationSki":true,"tarif":1600},{"nom":"Cohen","prenom":"Sarah","categorie":"adulte","locationSki":false,"tarif":1450},{"nom":"Cohen","prenom":"Tom","categorie":"enfant","chambre":"partagee","coursSki":true,"niveau":"Flocon","duree":"6h","locationSki":true,"tarif":1450},{"nom":"Cohen","prenom":"Leia","categorie":"bebe","tarif":450}]',
+    familleJSON: '[{"nom":"Cohen","prenom":"David","categorie":"adulte","chambreNumero":1,"locationSki":true,"tarif":1650},{"nom":"Cohen","prenom":"Sarah","categorie":"adulte","chambreNumero":1,"locationSki":false,"tarif":1500},{"nom":"Cohen","prenom":"Tom","categorie":"enfant","chambreNumero":1,"tarifPromu":false,"coursSki":true,"niveau":"Flocon","duree":"6h","locationSki":true,"tarif":1450},{"nom":"Cohen","prenom":"Leia","categorie":"bebe","chambreNumero":1,"tarif":450}]',
     chambresAdultes: 2,
     chambresEnfants: 1,
     bebes: 1,
-    tarifChambresAdultes: 2900,
+    tarifChambresAdultes: 3000,
     tarifChambresEnfants: 1000,
     tarifBebes: 450,
     tarifOptions: 600,
     notes: 'Régime casher strict',
     remiseAppliquee: 'Non',
     remiseAmount: 0,
-    totalEUR: 4950,
-    totalApresRemise: 4950,
+    totalEUR: 5050,
+    totalApresRemise: 5050,
     acomptEUR: 1500,
-    soldeEUR: 3450,
+    soldeEUR: 3550,
     taxeSejourEUR: 20,
     cautionEUR: 100,
     paiementIntegral: false,

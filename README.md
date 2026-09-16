@@ -174,7 +174,9 @@ Code espace organisateur (sélection de chambres / remise): 2861
 ## 📝 Notes Importantes
 
 - ✅ L'acompte est fixe (1 500 €), pas un pourcentage, contrairement au projet Souccot
-- ✅ Enfant 3-12 ans : 1 000 € en partageant la chambre des parents, 1 450 € en chambre séparée
+- ✅ Adulte : 1 500 € — Enfant (tarif réduit) : 1 000 € — Bébé : 450 €
+- ✅ **Logique chambre** : chaque chambre (2 à 4 personnes, bébés non comptés) doit rapporter au minimum 3 000 €. Si les adultes d'une chambre ne couvrent pas ce minimum, des enfants de cette chambre sont automatiquement "promus" au tarif adulte (1 500 €) jusqu'à l'atteindre ; les enfants suivants dans la même chambre restent au tarif réduit. Une chambre à moins de 2 ou plus de 4 personnes (hors bébés) est signalée en erreur.
+- ✅ Chaque membre de la famille indique son numéro de chambre dans le tableau ; le récapitulatif affiche le détail et les éventuelles erreurs par chambre
 - ✅ Location de matériel de ski : 150 € (adulte) / 100 € (enfant), par semaine
 - ✅ Cours de ski enfant : 350 € (6h/jour) ou 250 € (3h/jour)
 - ✅ Caution (100 €/chambre) et taxe de séjour (10 €/adulte) sont informatives, non incluses dans le total

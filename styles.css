@@ -307,6 +307,40 @@ header p {
     font-size: 0.9em;
 }
 
+.member-room {
+    max-width: 60px;
+    text-align: center;
+    font-weight: 600;
+}
+
+.rooms-breakdown {
+    margin-top: 14px;
+}
+
+.rooms-breakdown-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.room-summary-item {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 8px 12px;
+    background: rgba(231, 244, 251, 0.6);
+    border-left: 3px solid var(--secondary-color);
+    border-radius: 6px;
+    font-size: 0.88em;
+}
+
+.room-summary-item.room-summary-error {
+    background: rgba(255, 230, 230, 0.75);
+    border-left-color: #dc2626;
+    color: #9b1c1c;
+    font-weight: 600;
+}
+
 .family-age-display {
     display: inline-block;
     padding: 8px;
