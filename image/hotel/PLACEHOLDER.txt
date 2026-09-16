@@ -1,7 +1,0 @@
-Dépose ici les photos de l'Hôtel Savoia Resort (chambres, piscine, spa, extérieur, etc.).
-Formats acceptés : .jpg, .jpeg, .png, .webp
-
-Une fois les photos ajoutées, préviens-moi (Claude) et j'ajouterai automatiquement
-le carrousel "Découvrez l'Hôtel" sur la page d'inscription, comme pour le projet Souccot.
-
-Ce fichier peut être supprimé une fois les vraies photos ajoutées.
