@@ -4,7 +4,7 @@ const CONFIG = {
     EMAIL_SERVICE_URL: 'https://loisirel-ski.netlify.app/.netlify/functions',
 };
 
-// Tarifs (séjour Ski 2026 - Bardonecchia)
+// Tarifs (séjour Ski 2027 - Bardonecchia)
 // Logique chambre : chaque chambre doit rapporter un minimum de ROOM_MIN_REVENUE
 // et contenir entre ROOM_MIN_PEOPLE et ROOM_MAX_PEOPLE personnes (bébés exclus du calcul).
 // Si les adultes de la chambre ne couvrent pas le minimum, des enfants sont "promus"
@@ -17,7 +17,6 @@ const PRICES = {
     locationEnfant: 100,
     coursSki6h: 350,       // cours de ski enfant, 6h/jour
     coursSki3h: 250,       // cours de ski enfant, 3h/jour
-    acompteFixe: 1500,     // acompte fixe à la réservation
     cautionParChambre: 100,
     taxeSejourParAdulte: 10
 };
@@ -691,7 +690,7 @@ function calculateTotal() {
     }
 
     const finalTotal = remiseAmount > 0 ? remiseAmount : total;
-    const acompte = Math.min(PRICES.acompteFixe, finalTotal);
+    const acompte = Math.round(finalTotal * 0.5);
     const solde = finalTotal - acompte;
 
     // Mettre à jour le récapitulatif
@@ -855,7 +854,7 @@ function getFormData() {
     }
 
     const finalTotal = remiseAmount > 0 ? remiseAmount : total;
-    const acompte = Math.min(PRICES.acompteFixe, finalTotal);
+    const acompte = Math.round(finalTotal * 0.5);
     const solde = finalTotal - acompte;
     const remiseDifference = remiseAmount > 0 ? (total - remiseAmount) : 0;
     const remisePourcentage = (remiseAmount > 0 && total > 0) ? Math.round((remiseDifference / total) * 100) : 0;
@@ -1023,7 +1022,7 @@ function generateDevisPDF(formData, download = true) {
     doc.setFontSize(18);
     doc.text("CONFIRMATION D'INSCRIPTION", 105, 10, { align: 'center' });
     doc.setFontSize(11);
-    doc.text('LOISIREL SKI 2026 - HÔTEL SAVOIA RESORT BARDONECCHIA', 105, 18, { align: 'center' });
+    doc.text('LOISIREL SKI 2027 - HÔTEL SAVOIA RESORT BARDONECCHIA', 105, 18, { align: 'center' });
     y = 29;
 
     // Badge PENSION COMPLÈTE
@@ -1032,7 +1031,7 @@ function generateDevisPDF(formData, download = true) {
     doc.setFont(undefined, 'bold');
     doc.setTextColor(58, 32, 0);
     doc.setFontSize(9);
-    doc.text('PENSION COMPLÈTE GLATT CACHER', 105, y, { align: 'center' });
+    doc.text('PENSION COMPLÈTE GASTRONOMIQUE', 105, y, { align: 'center' });
     doc.setFont(undefined, 'normal');
     doc.setTextColor(0, 0, 0);
     y += 9;
@@ -1172,7 +1171,7 @@ function generateDevisPDF(formData, download = true) {
         doc.setTextColor(...primaryColor);
         doc.setFontSize(9);
     } else {
-        doc.text('Acompte à la réservation :', 10, y);
+        doc.text('Acompte 50% :', 10, y);
         doc.text(formData.acomptEUR + '€', 180, y, { align: 'right' });
         y += 5;
         doc.text('Solde :', 10, y);
@@ -1195,14 +1194,14 @@ function generateDevisPDF(formData, download = true) {
     doc.text('Titulaire du compte : TOVEL', 10, y); y += 5;
     doc.setFont(undefined, 'normal');
     doc.text('IBAN : FR76 1820 6002 1365 0425 2422 502   |   BIC : AGRFRPP882', 10, y); y += 5;
-    doc.text('Libelle du virement : Nom Prenom - Ski 2026', 10, y); y += 7;
+    doc.text('Libelle du virement : Nom Prenom - Ski 2027', 10, y); y += 7;
 
     // ── CONDITIONS GÉNÉRALES ─────────────────────────────────
     sectionHead('CONDITIONS GENERALES');
     doc.setFontSize(8);
     const conds = [
         'Chambres disponibles le dimanche a partir de 14h00.',
-        'Acompte de 1500 euros a la reservation.',
+        'Acompte de 50% a la reservation.',
         'Caution de 100 euros par chambre (remboursable).',
         "Taxe d'hebergement de 10 euros par adulte (+12 ans), payable sur place.",
         'Skipass a acheter sur place ou en ligne. Adhesion TOVEL incluse.'

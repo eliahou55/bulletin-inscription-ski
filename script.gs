@@ -1,5 +1,5 @@
 // ============================================================
-// GOOGLE APPS SCRIPT - SKI 2026 (BARDONECCHIA)
+// GOOGLE APPS SCRIPT - SKI 2027 (BARDONECCHIA)
 // ============================================================
 // Écrit dans 4 feuilles séparées à chaque inscription :
 //   - "Inscriptions"  : vue générale / tarification (une ligne par inscription)
@@ -89,7 +89,7 @@ function addDataToSheets(data) {
 
     // ---- Feuille générale "Inscriptions" ----
     const sheetInscriptions = getOrCreateSheet(spreadsheet, SHEET_INSCRIPTIONS, HEADERS_INSCRIPTIONS);
-    const inscriptionId = 'SKI-2026-' + (sheetInscriptions.getLastRow());
+    const inscriptionId = 'SKI-2027-' + (sheetInscriptions.getLastRow());
 
     let membres = [];
     try {

@@ -9,7 +9,7 @@ Vous avez maintenant tous les fichiers pour créer un bulletin d'inscription onl
 ## 1️⃣ Créer un Google Sheet
 → https://sheets.google.com/create
 
-Donner lui un nom (ex: "Ski 2026")
+Donner lui un nom (ex: "Ski 2027")
 
 ---
 

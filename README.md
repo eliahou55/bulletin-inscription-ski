@@ -1,8 +1,8 @@
-# Bulletin d'Inscription Ski 2026 - Guide d'Installation
+# Bulletin d'Inscription Ski 2027 - Guide d'Installation
 
 ## 📋 Vue d'ensemble
 
-Ce projet est un bulletin d'inscription en ligne pour le séjour au ski 2026 (du 14 février au 21 février 2026, 7 nuits / 8 jours) à l'Hôtel Savoia Resort **** à Bardonecchia, Italie. Les inscriptions sont automatiquement sauvegardées dans un Google Sheet réparti en 4 feuilles (voir plus bas).
+Ce projet est un bulletin d'inscription en ligne pour le séjour au ski 2027 (du 14 février au 21 février 2027, 7 nuits / 8 jours) à l'Hôtel Savoia Resort **** à Bardonecchia, Italie. Les inscriptions sont automatiquement sauvegardées dans un Google Sheet réparti en 4 feuilles (voir plus bas).
 
 **Caractéristiques:**
 - ✅ Formulaire responsive et professionnel (style "verre liquide")
@@ -18,7 +18,7 @@ Ce projet est un bulletin d'inscription en ligne pour le séjour au ski 2026 (du
 ### **ÉTAPE 1: Préparer Google Sheets**
 
 1. Allez sur [Google Sheets](https://sheets.google.com)
-2. Créez un nouveau Google Sheet (donner-lui un nom, ex: "Inscriptions Ski 2026")
+2. Créez un nouveau Google Sheet (donner-lui un nom, ex: "Inscriptions Ski 2027")
 3. Vous pouvez laisser la première feuille vide - le script créera automatiquement les headers
 4. ⚠️ Ce Google Sheet doit être **différent** de celui utilisé pour Souccot/Pessah - chaque événement a son propre Sheet et son propre déploiement Apps Script
 
@@ -28,7 +28,6 @@ Ce projet est un bulletin d'inscription en ligne pour le séjour au ski 2026 (du
 - **Cours de Ski** : une ligne par enfant inscrit à un cours (ID Inscription, Nom Contact, Nom/Prénom Enfant, Âge, Niveau, Durée, Tarif Cours)
 - **Locations** : une ligne par personne ayant loué du matériel de ski (ID Inscription, Nom Contact, Nom/Prénom, Catégorie, Tarif Location)
 - **Chambres** : une ligne par chambre réservée (ID Inscription, Nom Contact, N° Chambre, Adultes, Enfants, Enfants au tarif adulte, Bébés, Total Chambre)
-- Chambre Double, Chambre Familiale, Suite, Chalet
 
 ---
 
@@ -44,7 +43,7 @@ Ce projet est un bulletin d'inscription en ligne pour le séjour au ski 2026 (du
 
 3. **Copier le code du backend:**
    - Supprimer le code par défaut dans `Code.gs`
-   - Copier-coller tout le contenu du fichier `script.gs` fourni (version Ski 2026)
+   - Copier-coller tout le contenu du fichier `script.gs` fourni (version Ski 2027)
    - Sauvegarder: `Ctrl+S` (ou `Cmd+S` sur Mac)
 
 4. **Lier le Google Sheet au Script:**
@@ -100,7 +99,7 @@ Ce projet est un bulletin d'inscription en ligne pour le séjour au ski 2026 (du
    - Un message vert devrait apparaître: "✅ Inscription envoyée avec succès!"
 
 3. **Vérifier dans Google Sheets:**
-   - Aller sur votre Google Sheet "Inscriptions Ski 2026"
+   - Aller sur votre Google Sheet "Inscriptions Ski 2027"
    - Les données de test doivent apparaître dans une nouvelle ligne
 
 ---
@@ -137,7 +136,7 @@ Les dossiers `image/hotel/` et `image/traiteur/` sont prêts à recevoir vos pho
 - [ ] Sélectionner "Enfant" fait apparaître les options (chambre, cours de ski, location)
 - [ ] Sélectionner "Adulte" fait apparaître l'option de location de ski
 - [ ] Calcul du total fonctionne en temps réel avec toutes les options
-- [ ] Acompte fixe = 1 500 € (jusqu'à concurrence du total)
+- [ ] Acompte = 50% du total
 - [ ] Bouton "Soumettre" envoie bien les données
 - [ ] Les données s'ajoutent au Google Sheet
 - [ ] Le formulaire fonctionne sur mobile
@@ -156,7 +155,7 @@ Voir le fichier `QUICKSTART.md` pour les problèmes les plus courants (URL non c
 Hôtel Savoia Resort **** - Bardonecchia, Italie
 Accès via aéroports de Turin ou Milan (transport aller-retour en train en option)
 
-Séjour 2026: du 14 février au 21 février 2026 (7 nuits / 8 jours)
+Séjour 2027: du 14 février au 21 février 2027 (7 nuits / 8 jours)
 
 Sous la supervision du Dayan Rav Ephraïm Cremisi
 
@@ -172,7 +171,7 @@ Code espace organisateur (sélection de chambres / remise): 2861
 
 ## 📝 Notes Importantes
 
-- ✅ L'acompte est fixe (1 500 €), pas un pourcentage, contrairement au projet Souccot
+- ✅ L'acompte est de 50% du total (même logique que le projet Souccot)
 - ✅ Adulte : 1 500 € — Enfant (tarif réduit) : 1 000 € — Bébé : 500 €
 - ✅ **Logique chambre** : chaque chambre (2 à 4 personnes, bébés non comptés) doit rapporter au minimum 3 000 €. Si les adultes d'une chambre ne couvrent pas ce minimum, des enfants de cette chambre sont automatiquement "promus" au tarif adulte (1 500 €) jusqu'à l'atteindre ; les enfants suivants dans la même chambre restent au tarif réduit. Une chambre à moins de 2 ou plus de 4 personnes (hors bébés) est signalée en erreur.
 - ✅ Chaque membre est assigné par défaut à la Chambre 1 (remplissage automatique à 4 personnes max) ; un menu déroulant permet de le déplacer vers une nouvelle chambre. Le récapitulatif affiche le détail et les éventuelles erreurs par chambre, ainsi que le nombre total de chambres réservées

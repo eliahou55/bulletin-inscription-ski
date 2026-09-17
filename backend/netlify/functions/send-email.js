@@ -41,7 +41,7 @@ exports.handler = async (event) => {
                 'Authorization': `Bearer ${RESEND_API_KEY}`,
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ from: `Loisirel Ski 2026 <${FROM_EMAIL}>`, to, subject, html, attachments: attachment })
+            body: JSON.stringify({ from: `Loisirel Ski 2027 <${FROM_EMAIL}>`, to, subject, html, attachments: attachment })
         });
         if (!res.ok) {
             const err = await res.json();
@@ -50,8 +50,8 @@ exports.handler = async (event) => {
     }
 
     try {
-        await sendEmail(formData.emailContact, "Confirmation d'inscription - Ski 2026", buildClientHTML(formData, finalTotal));
-        await sendEmail(ORGANIZER_EMAIL, `Nouvelle inscription - ${formData.nomContact} ${formData.prenomContact} - Ski 2026`, buildOrganizerHTML(formData, finalTotal));
+        await sendEmail(formData.emailContact, "Confirmation d'inscription - Ski 2027", buildClientHTML(formData, finalTotal));
+        await sendEmail(ORGANIZER_EMAIL, `Nouvelle inscription - ${formData.nomContact} ${formData.prenomContact} - Ski 2027`, buildOrganizerHTML(formData, finalTotal));
         return { statusCode: 200, headers: CORS, body: JSON.stringify({ success: true }) };
     } catch (error) {
         console.error('Erreur email:', error);
@@ -66,20 +66,20 @@ function buildClientHTML(data, finalTotal) {
 <body style="margin:0;padding:0;font-family:Arial,sans-serif;background:#f4f4f4;">
 <table width="100%" cellpadding="0" cellspacing="0" style="max-width:600px;margin:0 auto;background:#fff;">
   <tr><td style="background:#0b5f8a;padding:25px;text-align:center;">
-    <h1 style="color:#fff;margin:0;font-size:22px;">LOISIREL SKI 2026</h1>
+    <h1 style="color:#fff;margin:0;font-size:22px;">LOISIREL SKI 2027</h1>
     <p style="color:#dcf0fa;margin:5px 0 0;">Hôtel Savoia Resort **** - Bardonecchia, Italie</p>
   </td></tr>
   <tr><td style="padding:30px;">
     <h2 style="color:#0b5f8a;margin-top:0;">Confirmation d'inscription</h2>
     <p>Bonjour <strong>${data.prenomContact} ${data.nomContact}</strong>,</p>
-    <p>Nous avons bien recu votre inscription pour le sejour au ski 2026. Votre devis complet est joint en piece attachee.</p>
-    <p style="display:inline-block;background:#ff8c3a;color:#3a2000;font-weight:800;padding:6px 16px;border-radius:999px;font-size:13px;">PENSION COMPLÈTE GLATT CACHER</p>
+    <p>Nous avons bien recu votre inscription pour le sejour au ski 2027. Votre devis complet est joint en piece attachee.</p>
+    <p style="display:inline-block;background:#ff8c3a;color:#3a2000;font-weight:800;padding:6px 16px;border-radius:999px;font-size:13px;">PENSION COMPLÈTE GASTRONOMIQUE</p>
     <table width="100%" cellpadding="8" cellspacing="0" style="border-collapse:collapse;font-size:14px;">
       <tr style="background:#e7f4fb;"><td style="border:1px solid #ddd;"><strong>Contact</strong></td><td style="border:1px solid #ddd;">${data.prenomContact} ${data.nomContact} — ${data.portable || 'N/A'}</td></tr>
       <tr><td style="border:1px solid #ddd;"><strong>Personnes</strong></td><td style="border:1px solid #ddd;">${data.nombrePersonnes}</td></tr>
       ${remiseLine}
       <tr style="background:#0b5f8a;"><td style="border:1px solid #0b5f8a;color:#fff;padding:10px;"><strong>TOTAL</strong></td><td style="border:1px solid #0b5f8a;color:#fff;padding:10px;"><strong>${finalTotal}€</strong></td></tr>
-      <tr><td style="border:1px solid #ddd;">Acompte à la réservation</td><td style="border:1px solid #ddd;">${data.acomptEUR}€</td></tr>
+      <tr><td style="border:1px solid #ddd;">Acompte 50%</td><td style="border:1px solid #ddd;">${data.acomptEUR}€</td></tr>
       <tr style="background:#e7f4fb;"><td style="border:1px solid #ddd;">Solde</td><td style="border:1px solid #ddd;">${data.soldeEUR}€</td></tr>
     </table>
     <div style="background:#fff8e1;border-left:4px solid #f59e0b;padding:15px;margin-top:20px;border-radius:4px;">
@@ -92,7 +92,7 @@ function buildClientHTML(data, finalTotal) {
       <strong>Reglement par virement :</strong><br>
       <strong style="color:#0b5f8a;">Titulaire du compte : TOVEL</strong><br>
       IBAN : FR76 1820 6002 1365 0425 2422 502<br>BIC : AGRFRPP882<br>
-      Libelle : <strong>${data.nomContact} ${data.prenomContact} - Ski 2026</strong>
+      Libelle : <strong>${data.nomContact} ${data.prenomContact} - Ski 2027</strong>
     </div>
     <p style="margin-top:20px;color:#555;">Pour toute question : téléphone / WhatsApp au <strong>06 12 20 28 61</strong> ou email <a href="mailto:loisirel@hotmail.fr">loisirel@hotmail.fr</a></p>
   </td></tr>
@@ -123,7 +123,7 @@ function buildOrganizerHTML(data, finalTotal) {
 <body style="margin:0;padding:0;font-family:Arial,sans-serif;background:#f4f4f4;">
 <table width="100%" cellpadding="0" cellspacing="0" style="max-width:600px;margin:0 auto;background:#fff;">
   <tr><td style="background:#0b5f8a;padding:20px;text-align:center;">
-    <h1 style="color:#fff;margin:0;font-size:18px;">NOUVELLE INSCRIPTION — SKI 2026</h1>
+    <h1 style="color:#fff;margin:0;font-size:18px;">NOUVELLE INSCRIPTION — SKI 2027</h1>
   </td></tr>
   <tr><td style="padding:25px;">
     <h2 style="color:#0b5f8a;margin-top:0;">${data.prenomContact} ${data.nomContact}</h2>
@@ -134,7 +134,7 @@ function buildOrganizerHTML(data, finalTotal) {
       ${data.notes ? `<tr><td style="border:1px solid #ddd;"><strong>Notes</strong></td><td style="border:1px solid #ddd;">${data.notes}</td></tr>` : ''}
       ${remiseLine}
       <tr style="background:#0b5f8a;"><td style="border:1px solid #0b5f8a;color:#fff;padding:10px;"><strong>TOTAL</strong></td><td style="border:1px solid #0b5f8a;color:#fff;padding:10px;"><strong>${finalTotal}€</strong></td></tr>
-      <tr><td style="border:1px solid #ddd;">Acompte à la réservation</td><td style="border:1px solid #ddd;">${data.acomptEUR}€</td></tr>
+      <tr><td style="border:1px solid #ddd;">Acompte 50%</td><td style="border:1px solid #ddd;">${data.acomptEUR}€</td></tr>
       <tr style="background:#e7f4fb;"><td style="border:1px solid #ddd;">Solde</td><td style="border:1px solid #ddd;">${data.soldeEUR}€</td></tr>
       <tr><td style="border:1px solid #ddd;">Taxe de séjour / Caution</td><td style="border:1px solid #ddd;">${data.taxeSejourEUR}€ / ${data.cautionEUR}€ par chambre</td></tr>
       <tr style="background:#e7f4fb;"><td style="border:1px solid #ddd;"><strong>Chambres réservées</strong></td><td style="border:1px solid #ddd;">${data.nombreChambresReservees || 0}</td></tr>

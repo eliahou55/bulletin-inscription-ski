@@ -9,7 +9,7 @@ app.use(cors());
 app.use(express.json({ limit: '15mb' }));
 
 // ── Route santé ──────────────────────────────────────────────
-app.get('/', (req, res) => res.send('Ski 2026 - Email Service OK'));
+app.get('/', (req, res) => res.send('Ski 2027 - Email Service OK'));
 
 // ── Envoi du devis par email ─────────────────────────────────
 app.post('/send-email', async (req, res) => {
@@ -30,18 +30,18 @@ app.post('/send-email', async (req, res) => {
     try {
         // ── Email de confirmation au client ──────────────────
         await resend.emails.send({
-            from: `Loisirel Ski 2026 <${FROM_EMAIL}>`,
+            from: `Loisirel Ski 2027 <${FROM_EMAIL}>`,
             to: formData.emailContact,
-            subject: "Confirmation d'inscription - Ski 2026",
+            subject: "Confirmation d'inscription - Ski 2027",
             html: buildClientEmail(formData, finalTotal),
             attachments: pdfAttachment
         });
 
         // ── Notification à l'organisateur ────────────────────
         await resend.emails.send({
-            from: `Formulaire Ski 2026 <${FROM_EMAIL}>`,
+            from: `Formulaire Ski 2027 <${FROM_EMAIL}>`,
             to: ORGANIZER_EMAIL,
-            subject: `Nouvelle inscription - ${formData.nomContact} ${formData.prenomContact} - Ski 2026`,
+            subject: `Nouvelle inscription - ${formData.nomContact} ${formData.prenomContact} - Ski 2027`,
             html: buildOrganizerEmail(formData, finalTotal),
             attachments: pdfAttachment
         });
@@ -65,7 +65,7 @@ function buildClientEmail(data, finalTotal) {
   <table width="100%" cellpadding="0" cellspacing="0" style="max-width:600px;margin:0 auto;background:#fff;">
     <tr>
       <td style="background:#0b5f8a;padding:25px;text-align:center;">
-        <h1 style="color:#fff;margin:0;font-size:22px;">LOISIREL SKI 2026</h1>
+        <h1 style="color:#fff;margin:0;font-size:22px;">LOISIREL SKI 2027</h1>
         <p style="color:#dcf0fa;margin:5px 0 0;">Hôtel Savoia Resort **** - Bardonecchia, Italie</p>
       </td>
     </tr>
@@ -73,9 +73,9 @@ function buildClientEmail(data, finalTotal) {
       <td style="padding:30px;">
         <h2 style="color:#0b5f8a;margin-top:0;">Confirmation d'inscription</h2>
         <p>Bonjour <strong>${data.prenomContact} ${data.nomContact}</strong>,</p>
-        <p>Nous avons bien reçu votre inscription pour le séjour au ski 2026. Votre devis complet est joint en pièce attachée.</p>
+        <p>Nous avons bien reçu votre inscription pour le séjour au ski 2027. Votre devis complet est joint en pièce attachée.</p>
 
-        <p style="display:inline-block;background:#ff8c3a;color:#3a2000;font-weight:800;padding:6px 16px;border-radius:999px;font-size:13px;">PENSION COMPLÈTE GLATT CACHER</p>
+        <p style="display:inline-block;background:#ff8c3a;color:#3a2000;font-weight:800;padding:6px 16px;border-radius:999px;font-size:13px;">PENSION COMPLÈTE GASTRONOMIQUE</p>
 
         <h3 style="color:#0b5f8a;border-bottom:2px solid #0b5f8a;padding-bottom:6px;">Récapitulatif</h3>
         <table width="100%" cellpadding="8" cellspacing="0" style="border-collapse:collapse;font-size:14px;">
@@ -97,7 +97,7 @@ function buildClientEmail(data, finalTotal) {
             <td style="border:1px solid #0b5f8a;color:#fff;padding:10px;"><strong>${finalTotal}€</strong></td>
           </tr>
           <tr>
-            <td style="border:1px solid #ddd;">Acompte à la réservation</td>
+            <td style="border:1px solid #ddd;">Acompte 50%</td>
             <td style="border:1px solid #ddd;">${data.acomptEUR}€</td>
           </tr>
           <tr style="background:#e7f4fb;">
@@ -118,7 +118,7 @@ function buildClientEmail(data, finalTotal) {
           <strong style="color:#0b5f8a;">Titulaire du compte : TOVEL</strong><br>
           IBAN : FR76 1820 6002 1365 0425 2422 502<br>
           BIC : AGRFRPP882<br>
-          Libellé : <strong>${data.nomContact} ${data.prenomContact} - Ski 2026</strong>
+          Libellé : <strong>${data.nomContact} ${data.prenomContact} - Ski 2027</strong>
         </div>
 
         <p style="margin-top:20px;color:#555;">Pour toute question, contactez-nous par téléphone / WhatsApp au <strong>06 12 20 28 61</strong> ou par email à <a href="mailto:loisirel@hotmail.fr">loisirel@hotmail.fr</a>.</p>
@@ -162,7 +162,7 @@ function buildOrganizerEmail(data, finalTotal) {
   <table width="100%" cellpadding="0" cellspacing="0" style="max-width:600px;margin:0 auto;background:#fff;">
     <tr>
       <td style="background:#0b5f8a;padding:20px;text-align:center;">
-        <h1 style="color:#fff;margin:0;font-size:18px;">NOUVELLE INSCRIPTION — SKI 2026</h1>
+        <h1 style="color:#fff;margin:0;font-size:18px;">NOUVELLE INSCRIPTION — SKI 2027</h1>
       </td>
     </tr>
     <tr>
@@ -192,7 +192,7 @@ function buildOrganizerEmail(data, finalTotal) {
             <td style="border:1px solid #0b5f8a;color:#fff;padding:10px;"><strong>${finalTotal}€</strong></td>
           </tr>
           <tr>
-            <td style="border:1px solid #ddd;">Acompte à la réservation</td>
+            <td style="border:1px solid #ddd;">Acompte 50%</td>
             <td style="border:1px solid #ddd;">${data.acomptEUR}€</td>
           </tr>
           <tr style="background:#e7f4fb;">
