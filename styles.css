@@ -49,7 +49,7 @@ h1, h2, h3, h4 {
 header {
     position: relative;
     background:
-        linear-gradient(165deg, rgba(6, 40, 60, 0.6) 0%, rgba(11, 95, 138, 0.4) 45%, rgba(6, 40, 60, 0.7) 100%),
+        linear-gradient(165deg, rgba(6, 40, 60, 0.22) 0%, rgba(11, 95, 138, 0.12) 45%, rgba(6, 40, 60, 0.3) 100%),
         url('image/hero-mountain.avif') center 42% / cover no-repeat;
     color: white;
     padding: 40px 20px;
@@ -65,7 +65,7 @@ header .subtitle,
 header .dates,
 header .hotel,
 header .supervision-line {
-    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.45);
+    text-shadow: 0 2px 6px rgba(0, 0, 0, 0.75), 0 1px 2px rgba(0, 0, 0, 0.9);
 }
 
 header::before {
@@ -91,10 +91,47 @@ header > * {
 
 .logo-img {
     display: block;
-    height: 60px;
+    height: 92px;
     width: auto;
     margin: 0 auto;
     filter: drop-shadow(0 6px 16px rgba(0, 0, 0, 0.4));
+}
+
+.italy-divider {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin: 10px 0;
+}
+
+.italy-word {
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.95em;
+    font-weight: 600;
+    letter-spacing: 4px;
+    color: white;
+    text-shadow: 0 2px 6px rgba(0, 0, 0, 0.7);
+}
+
+.italy-line {
+    width: 56px;
+    height: 2px;
+    border-radius: 2px;
+}
+
+.italy-line-green {
+    background: linear-gradient(90deg, transparent, #009246);
+}
+
+.italy-line-red {
+    background: linear-gradient(90deg, #ce2b37, transparent);
+}
+
+@media (max-width: 480px) {
+    .italy-line {
+        width: 34px;
+    }
 }
 
 .hero-greeting {
@@ -156,13 +193,17 @@ header p {
 .pension-badge {
     display: inline-block;
     margin-top: 14px;
-    padding: 6px 16px;
-    background: var(--accent-color);
-    color: #3a2a00;
+    padding: 7px 18px;
+    background: rgba(255, 255, 255, 0.16);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    color: white;
     font-weight: 800;
     font-size: 0.95em;
     letter-spacing: 0.5px;
     border-radius: 999px;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.6);
 }
 
 /* Form Container */
@@ -2154,9 +2195,13 @@ footer p {
 .highlights-section {
     position: relative;
     margin: 0 30px 30px;
-    padding: 28px 30px;
+    padding: 36px 30px;
+    min-height: 460px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
     background:
-        linear-gradient(165deg, rgba(6, 40, 60, 0.72) 0%, rgba(11, 95, 138, 0.32) 55%, rgba(6, 40, 60, 0.68) 100%),
+        linear-gradient(165deg, rgba(6, 40, 60, 0.28) 0%, rgba(11, 95, 138, 0.12) 55%, rgba(6, 40, 60, 0.25) 100%),
         url('image/savoia-exterior-snow.jpg') center 35% / cover no-repeat;
     border: 1px solid rgba(255, 255, 255, 0.35);
     border-radius: 14px;
@@ -2174,10 +2219,10 @@ footer p {
     display: flex;
     align-items: flex-start;
     gap: 12px;
-    background: rgba(255, 255, 255, 0.82);
-    backdrop-filter: blur(6px);
-    -webkit-backdrop-filter: blur(6px);
-    border: 1px solid rgba(255, 255, 255, 0.6);
+    background: rgba(255, 255, 255, 0.4);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    border: 1px solid rgba(255, 255, 255, 0.55);
     border-radius: 10px;
     padding: 14px 16px;
     transition: transform 0.25s ease, box-shadow 0.25s ease;
@@ -2206,6 +2251,7 @@ footer p {
 .highlight-card p {
     font-size: 0.92em;
     color: var(--text-dark);
+    text-shadow: 0 1px 3px rgba(255, 255, 255, 0.7);
 }
 
 .highlights-note {
@@ -2220,6 +2266,7 @@ footer p {
     .highlights-section {
         margin: 0 15px 20px;
         padding: 20px;
+        min-height: 0;
     }
 }
 
