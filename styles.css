@@ -64,8 +64,15 @@ header h2,
 header .subtitle,
 header .dates,
 header .hotel,
-header .supervision-line {
-    text-shadow: 0 2px 6px rgba(0, 0, 0, 0.75), 0 1px 2px rgba(0, 0, 0, 0.9);
+header .supervision-line,
+header .hero-greeting .greeting-main,
+header .italy-word {
+    text-shadow:
+        -1px -1px 1.5px rgba(8, 24, 34, 0.6),
+        1px -1px 1.5px rgba(8, 24, 34, 0.6),
+        -1px 1px 1.5px rgba(8, 24, 34, 0.6),
+        1px 1px 1.5px rgba(8, 24, 34, 0.6),
+        0 2px 8px rgba(8, 24, 34, 0.55);
 }
 
 header::before {
@@ -107,15 +114,14 @@ header > * {
 
 .italy-word {
     font-family: 'Poppins', sans-serif;
-    font-size: 0.95em;
+    font-size: 1.5em;
     font-weight: 600;
-    letter-spacing: 4px;
+    letter-spacing: 5px;
     color: white;
-    text-shadow: 0 2px 6px rgba(0, 0, 0, 0.7);
 }
 
 .italy-line {
-    width: 56px;
+    width: 68px;
     height: 2px;
     border-radius: 2px;
 }
@@ -130,7 +136,7 @@ header > * {
 
 @media (max-width: 480px) {
     .italy-line {
-        width: 34px;
+        width: 40px;
     }
 }
 
@@ -144,7 +150,6 @@ header > * {
     font-weight: 600;
     font-style: italic;
     letter-spacing: 0.3px;
-    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
     opacity: 0.95;
 }
 
@@ -2194,7 +2199,6 @@ footer p {
 /* ===== POINTS FORTS (highlights) ===== */
 .highlights-section {
     position: relative;
-    margin: 0 30px 30px;
     padding: 36px 30px;
     min-height: 460px;
     display: flex;
@@ -2203,8 +2207,6 @@ footer p {
     background:
         linear-gradient(165deg, rgba(6, 40, 60, 0.28) 0%, rgba(11, 95, 138, 0.12) 55%, rgba(6, 40, 60, 0.25) 100%),
         url('image/savoia-exterior-snow.jpg') center 35% / cover no-repeat;
-    border: 1px solid rgba(255, 255, 255, 0.35);
-    border-radius: 14px;
     overflow: hidden;
 }
 
@@ -2264,8 +2266,7 @@ footer p {
 
 @media (max-width: 768px) {
     .highlights-section {
-        margin: 0 15px 20px;
-        padding: 20px;
+        padding: 20px 15px 26px;
         min-height: 0;
     }
 }
