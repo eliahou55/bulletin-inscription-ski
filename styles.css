@@ -1200,6 +1200,22 @@ header p {
     line-height: 1.6;
 }
 
+.condition-sublink {
+    margin-top: -4px;
+    margin-left: 18px;
+    font-style: italic;
+}
+
+.condition-sublink a {
+    color: #0b5f8a;
+    font-weight: 600;
+    text-decoration: underline;
+}
+
+.condition-sublink a:hover {
+    color: #073d59;
+}
+
 /* Form Actions */
 .form-actions {
     display: flex;
@@ -2246,4 +2262,70 @@ footer p {
     .member-options {
         gap: 12px;
     }
+}
+
+/* ===== LIEN EXTERNE (galerie officielle, etc.) ===== */
+.external-link-btn {
+    display: inline-block;
+    margin-top: 18px;
+    padding: 10px 20px;
+    border: 2px solid var(--secondary-color);
+    border-radius: 999px;
+    color: var(--secondary-color);
+    font-weight: 600;
+    font-size: 0.92em;
+    text-decoration: none;
+    transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
+}
+
+.external-link-btn:hover {
+    background: var(--secondary-color);
+    color: white;
+    transform: translateY(-1px);
+}
+
+/* ===== VIDÉOS REELS (plein écran, défilement type Shorts) ===== */
+.reels-section {
+    scroll-snap-type: y proximity;
+}
+
+.reel {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    height: 100dvh;
+    scroll-snap-align: start;
+    overflow: hidden;
+    background: #000;
+}
+
+.reel-video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.reel-unmute-btn {
+    position: absolute;
+    left: 50%;
+    bottom: 32px;
+    transform: translateX(-50%);
+    padding: 10px 20px;
+    border: none;
+    border-radius: 999px;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    color: white;
+    font-size: 0.95em;
+    font-weight: 600;
+    cursor: pointer;
+    z-index: 2;
+    animation: reelUnmutePulse 1.6s ease-in-out infinite;
+}
+
+@keyframes reelUnmutePulse {
+    0%, 100% { opacity: 0.85; }
+    50% { opacity: 1; }
 }

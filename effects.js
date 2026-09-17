@@ -4,7 +4,53 @@ document.addEventListener('DOMContentLoaded', function () {
     initRevealOnScroll();
     initLightbox();
     initCarousels();
+    initReels();
 });
+
+// ----- Vidéos "reels" (lecture avec son au scroll, comme un short) -----
+function initReels() {
+    const videos = document.querySelectorAll('.reel-video');
+    if (!videos.length) return;
+
+    const observer = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+            const video = entry.target;
+            if (entry.isIntersecting && entry.intersectionRatio >= 0.6) {
+                video.muted = false;
+                const playPromise = video.play();
+                if (playPromise && typeof playPromise.catch === 'function') {
+                    playPromise.catch(() => {
+                        // Le navigateur bloque la lecture avec son sans geste direct
+                        // sur la vidéo : on relance en muet et on propose de l'activer.
+                        video.muted = true;
+                        video.play().catch(() => {});
+                        showReelUnmuteButton(video);
+                    });
+                }
+            } else {
+                video.pause();
+            }
+        });
+    }, { threshold: [0, 0.6, 1] });
+
+    videos.forEach(video => observer.observe(video));
+}
+
+function showReelUnmuteButton(video) {
+    const reel = video.closest('.reel');
+    if (!reel || reel.querySelector('.reel-unmute-btn')) return;
+
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'reel-unmute-btn';
+    btn.textContent = '🔇 Activer le son';
+    btn.addEventListener('click', function () {
+        video.muted = false;
+        video.play();
+        btn.remove();
+    });
+    reel.appendChild(btn);
+}
 
 // ----- Carrousels galerie (hôtel / traiteur) -----
 function initCarousels() {
