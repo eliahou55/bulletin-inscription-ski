@@ -48,13 +48,24 @@ h1, h2, h3, h4 {
 /* Header */
 header {
     position: relative;
-    background: linear-gradient(160deg, rgba(11, 95, 138, 0.85) 0%, rgba(31, 143, 196, 0.7) 45%, rgba(11, 95, 138, 0.9) 100%);
+    background:
+        linear-gradient(165deg, rgba(6, 40, 60, 0.6) 0%, rgba(11, 95, 138, 0.4) 45%, rgba(6, 40, 60, 0.7) 100%),
+        url('image/hero-mountain.avif') center 42% / cover no-repeat;
     color: white;
     padding: 40px 20px;
     text-align: center;
     border-bottom: 1px solid rgba(255, 255, 255, 0.3);
     box-shadow: 0 1px 0 rgba(255, 255, 255, 0.15) inset;
     overflow: hidden;
+}
+
+header h1,
+header h2,
+header .subtitle,
+header .dates,
+header .hotel,
+header .supervision-line {
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.45);
 }
 
 header::before {
@@ -2141,13 +2152,15 @@ footer p {
 
 /* ===== POINTS FORTS (highlights) ===== */
 .highlights-section {
+    position: relative;
     margin: 0 30px 30px;
     padding: 28px 30px;
-    background: rgba(255, 255, 255, 0.4);
-    backdrop-filter: blur(16px) saturate(150%);
-    -webkit-backdrop-filter: blur(16px) saturate(150%);
-    border: 1px solid rgba(255, 255, 255, 0.45);
+    background:
+        linear-gradient(165deg, rgba(6, 40, 60, 0.72) 0%, rgba(11, 95, 138, 0.32) 55%, rgba(6, 40, 60, 0.68) 100%),
+        url('image/savoia-exterior-snow.jpg') center 35% / cover no-repeat;
+    border: 1px solid rgba(255, 255, 255, 0.35);
     border-radius: 14px;
+    overflow: hidden;
 }
 
 .highlights-grid {
@@ -2157,11 +2170,14 @@ footer p {
 }
 
 .highlight-card {
+    position: relative;
     display: flex;
     align-items: flex-start;
     gap: 12px;
-    background: rgba(255, 255, 255, 0.55);
-    border: 1px solid rgba(255, 255, 255, 0.5);
+    background: rgba(255, 255, 255, 0.82);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    border: 1px solid rgba(255, 255, 255, 0.6);
     border-radius: 10px;
     padding: 14px 16px;
     transition: transform 0.25s ease, box-shadow 0.25s ease;
@@ -2169,13 +2185,22 @@ footer p {
 
 .highlight-card:hover {
     transform: translateY(-3px);
-    box-shadow: 0 8px 20px rgba(11, 95, 138, 0.15);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
 }
 
 .highlight-icon {
-    font-size: 1.6em;
-    line-height: 1;
+    width: 32px;
+    height: 32px;
     flex-shrink: 0;
+    color: var(--primary-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.highlight-icon svg {
+    width: 100%;
+    height: 100%;
 }
 
 .highlight-card p {
@@ -2184,8 +2209,11 @@ footer p {
 }
 
 .highlights-note {
+    position: relative;
     margin: 18px 0 0;
     text-align: center;
+    color: rgba(255, 255, 255, 0.95);
+    text-shadow: 0 1px 5px rgba(0, 0, 0, 0.5);
 }
 
 @media (max-width: 768px) {
@@ -2195,7 +2223,6 @@ footer p {
     }
 }
 
-/* ===== BANNIÈRE SÉJOUR 2027 ===== */
 /* ===== OPTIONS PAR MEMBRE (ski, chambre) ===== */
 .family-options-row td {
     border-bottom: 1px solid var(--border-color);
