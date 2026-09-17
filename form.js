@@ -507,9 +507,20 @@ function computeOptimalCost(adultsCount, enfantsCount) {
     let total_cost = 0;
 
     sizes.forEach(size => {
-        const roomAdults = Math.min(2, remainingAdults, size);
-        remainingAdults -= roomAdults;
+        let roomAdults = Math.min(2, remainingAdults, size);
         const roomEnfants = Math.min(size - roomAdults, remainingEnfants);
+
+        // S'il reste de la place dans cette chambre après y avoir mis les
+        // enfants disponibles, et qu'il reste des adultes "en trop" (aucun
+        // enfant à leur associer), on les ajoute ici plutôt que de les
+        // perdre du calcul — un adulte coûte le même prix dans n'importe
+        // quelle chambre, ça ne change donc pas le coût minimal total.
+        const leftoverCapacity = size - roomAdults - roomEnfants;
+        if (leftoverCapacity > 0 && remainingAdults > roomAdults) {
+            roomAdults += Math.min(remainingAdults - roomAdults, leftoverCapacity);
+        }
+
+        remainingAdults -= roomAdults;
         remainingEnfants -= roomEnfants;
 
         const adultsRevenue = roomAdults * PRICES.adulte;
