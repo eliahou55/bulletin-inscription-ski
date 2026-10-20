@@ -1,7 +1,7 @@
 // Configuration
 const CONFIG = {
     GOOGLE_APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbwbyVoscFa1hbYmpTRQ3MjXV9VKT4EMqZs6LTAacjSq_qr29DLshH26hxJA5O7OAZ6p/exec',
-    EMAIL_SERVICE_URL: 'https://loisirel-ski.netlify.app/.netlify/functions',
+    EMAIL_SERVICE_URL: '/.netlify/functions',
 };
 
 // Tarifs (séjour Ski 2027 - Bardonecchia)

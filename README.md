@@ -76,7 +76,7 @@ Ce projet est un bulletin d'inscription en ligne pour le séjour au ski 2027 (du
    ```javascript
    const CONFIG = {
        GOOGLE_APPS_SCRIPT_URL: 'YOUR_GOOGLE_APPS_SCRIPT_URL_HERE',
-       EMAIL_SERVICE_URL: 'https://loisirel-ski.netlify.app/.netlify/functions',
+       EMAIL_SERVICE_URL: '/.netlify/functions',
    };
    ```
 
