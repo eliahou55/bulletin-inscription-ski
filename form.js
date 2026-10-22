@@ -941,16 +941,17 @@ async function handleFormSubmit(e) {
         const formData = getFormData();
         lastSubmittedData = formData;
 
-        // 1. Envoyer à Google Apps Script (sheets uniquement — inchangé)
+        const pdfBase64 = generateDevisPDF(formData, false);
+
+        // 1. Envoyer à Google Apps Script : écriture dans le Sheet + archivage du PDF dans Drive
         await fetch(CONFIG.GOOGLE_APPS_SCRIPT_URL, {
             method: 'POST',
             mode: 'no-cors',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(formData)
+            body: JSON.stringify({ ...formData, pdfBase64 })
         });
 
-        // 2. Générer le PDF et envoyer au backend pour l'email
-        const pdfBase64 = generateDevisPDF(formData, false);
+        // 2. Envoyer au backend pour l'email
         if (CONFIG.EMAIL_SERVICE_URL && CONFIG.EMAIL_SERVICE_URL !== 'YOUR_SKI_EMAIL_SERVICE_URL') {
             fetch(CONFIG.EMAIL_SERVICE_URL + '/send-email', {
                 method: 'POST',

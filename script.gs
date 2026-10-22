@@ -12,6 +12,9 @@ const SHEET_COURS_SKI = "Cours de Ski";
 const SHEET_LOCATIONS = "Locations";
 const SHEET_CHAMBRES = "Chambres";
 
+// Dossier Drive (même compte que le Sheet) où chaque devis PDF est archivé
+const DEVIS_FOLDER_NAME = "Devis Ski 2027";
+
 // ---- Headers (doivent correspondre exactement aux colonnes de chaque feuille) ----
 
 const HEADERS_INSCRIPTIONS = [
@@ -29,7 +32,8 @@ const HEADERS_INSCRIPTIONS = [
   "Total avant remise (€)", "Réduction (%)",
   "Paiement Intégral",
   "Taxe de Séjour (€)", "Caution par Chambre (€)",
-  "Chambre Double", "Chambre Familiale", "Suite", "Chalet"
+  "Chambre Double", "Chambre Familiale", "Suite", "Chalet",
+  "Devis PDF"
 ];
 
 const HEADERS_COURS_SKI = [
@@ -159,6 +163,24 @@ function addDataToSheets(data) {
     sheetInscriptions.appendRow(rowInscription);
     coloriserLigne(sheetInscriptions, sheetInscriptions.getLastRow(), color);
 
+    // ---- Archivage du devis PDF dans Drive + lien dans la feuille ----
+    // Un échec ici ne doit pas faire perdre l'inscription déjà écrite.
+    if (data.pdfBase64) {
+      try {
+        const url = saveDevisPDF(data, inscriptionId);
+        const linkCol = HEADERS_INSCRIPTIONS.length;
+        if (!sheetInscriptions.getRange(1, linkCol).getValue()) {
+          sheetInscriptions.getRange(1, linkCol).setValue('Devis PDF')
+            .setFontWeight('bold').setBackground('#0b5f8a').setFontColor('#ffffff');
+        }
+        sheetInscriptions.getRange(sheetInscriptions.getLastRow(), linkCol)
+          .setRichTextValue(SpreadsheetApp.newRichTextValue().setText('Ouvrir le devis').setLinkUrl(url).build())
+          .setBackground(color);
+      } catch (error) {
+        Logger.log('Erreur archivage PDF ' + inscriptionId + ': ' + error.toString());
+      }
+    }
+
     // ---- Feuille "Cours de Ski" : une ligne par enfant inscrit à un cours ----
     const enfantsAvecCours = membres.filter(m => m.categorie === 'enfant' && m.coursSki);
     if (enfantsAvecCours.length > 0) {
@@ -227,6 +249,24 @@ function getOrCreateSheet(spreadsheet, name, headers) {
     sheet.setFrozenRows(1);
   }
   return sheet;
+}
+
+function getDevisFolder() {
+  const folders = DriveApp.getFoldersByName(DEVIS_FOLDER_NAME);
+  return folders.hasNext() ? folders.next() : DriveApp.createFolder(DEVIS_FOLDER_NAME);
+}
+
+// À lancer une fois depuis l'éditeur : déclenche l'autorisation d'accès à Drive
+// (indispensable pour que le web app puisse archiver les PDF) et crée le dossier.
+function autoriserDrive() {
+  Logger.log('Dossier des devis : ' + getDevisFolder().getUrl());
+}
+
+function saveDevisPDF(data, inscriptionId) {
+  const folder = getDevisFolder();
+  const filename = inscriptionId + '_Devis_Ski_' + data.nomContact + '_' + data.prenomContact + '.pdf';
+  const blob = Utilities.newBlob(Utilities.base64Decode(data.pdfBase64), 'application/pdf', filename);
+  return folder.createFile(blob).getUrl();
 }
 
 function coloriserLigne(sheet, rowIndex, color) {
