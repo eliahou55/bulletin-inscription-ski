@@ -7,52 +7,75 @@
     <link rel="icon" type="image/png" href="logo.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div class="container">
-        <header>
+    <header class="hero">
+        <div class="hero-top">
             <div class="logo-wrap">
-                <img src="logo.png" alt="Loisirel Club Vacances" class="logo-img">
+                <img src="image/LOGO-LOISIREL-whitout-back.png" alt="Loisirel Club Vacances" class="logo-img">
             </div>
-            <h1>LOISIREL SKI 2027</h1>
-            <h2>HÔTEL SAVOIA RESORT **** BARDONECCHIA, ITALIE</h2>
+            <span class="hero-eyebrow">Loisirel Club Vacances — Hiver 2027</span>
+        </div>
+
+        <div class="hero-body">
+            <p class="hero-kicker">Hôtel Savoia Resort &nbsp;★★★★</p>
+            <h1>Loisirel Ski 2027</h1>
             <div class="italy-divider">
-                <span class="italy-line italy-line-green"></span>
-                <span class="italy-word">ITALIE</span>
-                <span class="italy-line italy-line-red"></span>
+                <span class="italy-line"></span>
+                <span class="italy-word">Bardonecchia · Italie</span>
+                <span class="italy-line"></span>
             </div>
-            <p class="hero-greeting">
-                <span class="greeting-main">✨ Se détendre, c'est l'essentiel</span>
-            </p>
-            <p class="subtitle">Bulletin d'Inscription - Séjour au Ski</p>
-            <p class="dates">Du 14 février au 21 février 2027 (7 nuits / 8 jours)</p>
-            <p class="hotel">1 800 m d'altitude, au pied des pistes</p>
-            <p class="pension-badge">Séjour en PENSION COMPLÈTE GASTRONOMIQUE</p>
-            <p class="supervision-line">Sous la supervision du Dayan Rav Ephraïm Cremisi</p>
-        </header>
+            <p class="hero-greeting">Se détendre, c'est l'essentiel</p>
+        </div>
+
+        <dl class="hero-facts">
+            <div class="hero-fact">
+                <dt>Dates</dt>
+                <dd>14 — 21 février 2027</dd>
+                <dd class="hero-fact-sub">7 nuits / 8 jours</dd>
+            </div>
+            <div class="hero-fact">
+                <dt>Altitude</dt>
+                <dd>1 800 m</dd>
+                <dd class="hero-fact-sub">Au pied des pistes</dd>
+            </div>
+            <div class="hero-fact">
+                <dt>Formule</dt>
+                <dd>Pension complète</dd>
+                <dd class="hero-fact-sub">Gastronomique</dd>
+            </div>
+        </dl>
+    </header>
+
+    <main class="container">
+        <p class="supervision-line">Sous la supervision du Dayan Rav Ephraïm Cremisi</p>
 
         <section class="highlights-section reveal">
+            <div class="section-heading section-heading-light">
+                <span class="section-index">Le séjour</span>
+                <h3>Un hiver d'exception</h3>
+            </div>
             <div class="highlights-grid">
                 <div class="highlight-card">
-                    <span class="highlight-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 20 9 8l4 6 2-3 6 9H3z"/></svg></span>
+                    <span class="highlight-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 20 9 8l4 6 2-3 6 9H3z"/></svg></span>
                     <p>Domaine et pistes d'exception : <strong>21 bleues, 18 rouges, 5 noires</strong></p>
                 </div>
                 <div class="highlight-card">
-                    <span class="highlight-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 21V7l8-4 8 4v14"/><path d="M9 21v-6h6v6"/><path d="M9 10h.01M15 10h.01M9 14h.01M15 14h.01"/></svg></span>
+                    <span class="highlight-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 21V7l8-4 8 4v14"/><path d="M9 21v-6h6v6"/><path d="M9 10h.01M15 10h.01M9 14h.01M15 14h.01"/></svg></span>
                     <p>Hébergement haut de gamme au pied des pistes : <strong>suites</strong>, chambres spacieuses, rénovées et lumineuses</p>
                 </div>
                 <div class="highlight-card">
-                    <span class="highlight-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M11 20A7 7 0 0 1 4 13c0-4 3-8 9-11 1 5 3 7 3 11a7 7 0 0 1-5 7z"/><path d="M11 20v-7"/></svg></span>
+                    <span class="highlight-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 20A7 7 0 0 1 4 13c0-4 3-8 9-11 1 5 3 7 3 11a7 7 0 0 1-5 7z"/><path d="M11 20v-7"/></svg></span>
                     <p>Bien-être : <strong>spa, sauna, piscine, fitness</strong>, piscine SPA et espace massage</p>
                 </div>
                 <div class="highlight-card">
-                    <span class="highlight-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>
+                    <span class="highlight-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>
                     <p>Activités famille : <strong>ski enfants, baby-club (9h30-12h / 14h-17h30), soirées</strong></p>
                 </div>
                 <div class="highlight-card">
-                    <span class="highlight-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></span>
+                    <span class="highlight-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></span>
                     <p>Animation jeux tous les soirs par <strong>Vip Orchestra</strong></p>
                 </div>
             </div>
@@ -60,7 +83,10 @@
         </section>
 
         <section class="gallery-section reveal">
-            <h3 class="gallery-title">Découvrez l'Hôtel</h3>
+            <div class="section-heading">
+                <span class="section-index">L'hôtel</span>
+                <h3 class="gallery-title">Découvrez l'Hôtel</h3>
+            </div>
             <p class="section-info">Hôtel Savoia Resort **** — au pied des pistes de Bardonecchia</p>
             <div class="carousel" data-carousel>
                 <button type="button" class="carousel-arrow carousel-arrow-prev" aria-label="Précédent">‹</button>
@@ -81,11 +107,14 @@
                 </div>
                 <button type="button" class="carousel-arrow carousel-arrow-next" aria-label="Suivant">›</button>
             </div>
-            <a href="https://www.savoiaresort.com/gallery/" target="_blank" rel="noopener noreferrer" class="external-link-btn">Voir plus de photos sur le site officiel de l'hôtel →</a>
+            <a href="https://www.savoiaresort.com/gallery/" target="_blank" rel="noopener noreferrer" class="external-link-btn">Voir plus de photos sur le site officiel de l'hôtel</a>
         </section>
 
         <section class="gallery-section reveal">
-            <h3 class="gallery-title">Notre Traiteur</h3>
+            <div class="section-heading">
+                <span class="section-index">La table</span>
+                <h3 class="gallery-title">Notre Traiteur</h3>
+            </div>
             <p class="section-info">Une cuisine raffinée en pension complète glatt cacher</p>
             <div class="carousel" data-carousel>
                 <button type="button" class="carousel-arrow carousel-arrow-prev" aria-label="Précédent">‹</button>
@@ -101,10 +130,18 @@
             </div>
         </section>
 
+        <div class="form-intro">
+            <span class="section-index">Réservation</span>
+            <h2>Bulletin d'inscription</h2>
+            <p>Séjour au ski — remplissez les informations ci-dessous pour recevoir votre devis.</p>
+        </div>
+
         <form id="inscriptionForm" class="form-container">
-            <!-- Section 1: Informations de Contact -->
             <section class="form-section contact-section">
-                <h3>Informations de Contact</h3>
+                <div class="section-heading">
+                    <span class="section-index">01</span>
+                    <h3>Informations de Contact</h3>
+                </div>
 
                 <div class="contact-grid">
                     <div class="form-group">
@@ -129,9 +166,11 @@
                 </div>
             </section>
 
-            <!-- Section 2: Membres de la Famille -->
             <section class="form-section">
-                <h3>Membres de la Famille</h3>
+                <div class="section-heading">
+                    <span class="section-index">02</span>
+                    <h3>Membres de la Famille</h3>
+                </div>
                 <p class="section-info">Saisissez les informations de chaque membre et sélectionnez sa catégorie - des options adaptées (ski, chambre) apparaîtront selon la catégorie choisie</p>
 
                 <div id="familyTableWrapper" class="family-table-wrapper">
@@ -156,9 +195,11 @@
                 <div id="roomsBreakdown" class="rooms-breakdown"></div>
             </section>
 
-            <!-- Section 3: Notes -->
             <section class="form-section">
-                <h3>Notes</h3>
+                <div class="section-heading">
+                    <span class="section-index">03</span>
+                    <h3>Notes</h3>
+                </div>
                 <div class="form-group">
                     <label for="notes">Notes additionnelles</label>
                     <textarea id="notes" name="notes" rows="4" placeholder="Laissez vos remarques ou demandes spéciales..."></textarea>
@@ -166,7 +207,10 @@
             </section>
 
             <section class="form-section recap-section">
-                <h3>Récapitulatif du Devis</h3>
+                <div class="section-heading">
+                    <span class="section-index">04</span>
+                    <h3>Récapitulatif du Devis</h3>
+                </div>
 
                 <div class="recap-container">
                     <div class="recap-item">
@@ -195,16 +239,15 @@
                     </div>
                     <div class="recap-divider"></div>
                     <div class="recap-item total">
-                        <span>TOTAL:</span>
+                        <span>Total</span>
                         <span id="recapTotal">0€</span>
                     </div>
-                    <div class="recap-item" id="recapRemise" style="display: none; color: #27ae60; font-weight: 600;"></div>
+                    <div class="recap-item recap-remise" id="recapRemise" style="display: none;"></div>
 
-                    <!-- Paiement intégral -->
-                    <div class="recap-item" style="margin-top:6px;">
-                        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-weight:600;">
-                            <input type="checkbox" id="paiementIntegral" style="width:16px;height:16px;cursor:pointer;">
-                            <span style="color:#0b5f8a;">✅ Total réglé en intégralité</span>
+                    <div class="recap-item recap-integral">
+                        <label class="integral-label">
+                            <input type="checkbox" id="paiementIntegral">
+                            <span>Total réglé en intégralité</span>
                         </label>
                     </div>
 
@@ -216,29 +259,30 @@
                         <span>Solde:</span>
                         <span id="recapSolde">0€</span>
                     </div>
-                    <div id="recapRegleRow" class="recap-item" style="display:none;">
-                        <span style="color:#0b5f8a;font-weight:700;">TOTAL RÉGLÉ :</span>
-                        <span id="recapRegle" style="color:#0b5f8a;font-weight:700;">0€</span>
+                    <div id="recapRegleRow" class="recap-item recap-regle" style="display:none;">
+                        <span>Total réglé :</span>
+                        <span id="recapRegle">0€</span>
                     </div>
                 </div>
             </section>
 
-            <!-- Section 6: Conditions -->
             <section class="form-section conditions">
-                <h3>Conditions Générales</h3>
+                <div class="section-heading">
+                    <span class="section-index">05</span>
+                    <h3>Conditions Générales</h3>
+                </div>
                 <div class="conditions-text">
-                    <p>✓ Chambres disponibles le dimanche à partir de 14h00.</p>
-                    <p>✓ Acompte de 50% à la réservation.</p>
-                    <p>✓ Caution de 100 € par chambre (remboursable).</p>
-                    <p>✓ Taxe d'hébergement de 10 € par adulte (+12 ans), payable sur place.</p>
-                    <p>✓ Skipass à acheter sur place ou en ligne (non inclus).</p>
-                    <p class="condition-sublink">→ <a href="https://share.google/XYNPxAdM1ojg8BVcj" target="_blank" rel="noopener noreferrer">Acheter votre forfait de ski en ligne</a></p>
+                    <p>Chambres disponibles le dimanche à partir de 14h00.</p>
+                    <p>Acompte de 50% à la réservation.</p>
+                    <p>Caution de 100 € par chambre (remboursable).</p>
+                    <p>Taxe d'hébergement de 10 € par adulte (+12 ans), payable sur place.</p>
+                    <p>Skipass à acheter sur place ou en ligne (non inclus).</p>
+                    <p class="condition-sublink"><a href="https://share.google/XYNPxAdM1ojg8BVcj" target="_blank" rel="noopener noreferrer">Acheter votre forfait de ski en ligne</a></p>
                 </div>
             </section>
 
-            <!-- Section 7: Espace Organisateur (verrouillé par code) -->
             <section class="form-section organizer-section">
-                <h3 class="organizer-warning">⚠️ À NE REMPLIR QUE PAR L'ORGANISATEUR</h3>
+                <h3 class="organizer-warning">À ne remplir que par l'organisateur</h3>
 
                 <button type="button" id="organizerToggleBtn" class="organizer-toggle-btn">
                     🔒 Espace organisateur — cliquer pour ouvrir
@@ -324,32 +368,30 @@
                 </div>
             </section>
 
-            <!-- Boutons -->
             <div class="form-actions">
                 <button type="submit" class="btn-submit">Soumettre l'Inscription</button>
                 <button type="reset" class="btn-reset">Réinitialiser</button>
             </div>
 
-            <!-- Message de statut -->
             <div id="statusMessage" class="status-message"></div>
         </form>
+    </main>
 
-        <section class="reels-section">
-            <div class="reel">
-                <video class="reel-video" src="video/reel-vip-ski.mp4" playsinline loop preload="metadata"></video>
-            </div>
-            <div class="reel">
-                <video class="reel-video" src="video/reel-winter-paradise.mp4" playsinline loop preload="metadata"></video>
-            </div>
-        </section>
+    <section class="reels-section">
+        <div class="reel">
+            <video class="reel-video" src="video/reel-vip-ski.mp4" playsinline loop preload="metadata"></video>
+        </div>
+        <div class="reel">
+            <video class="reel-video" src="video/reel-winter-paradise.mp4" playsinline loop preload="metadata"></video>
+        </div>
+    </section>
 
-        <footer>
-            <p>ADRESSE HÔTEL: Hôtel Savoia Resort ****</p>
-            <p>Bardonecchia, Italie (accès via aéroports de Turin ou Milan)</p>
-            <p><strong>Téléphone / WhatsApp : 06 12 20 28 61</strong></p>
-            <p>Email : loisirel@hotmail.fr — Site : www.loisirel.net</p>
-        </footer>
-    </div>
+    <footer>
+        <span class="footer-logo-wrap"><img src="image/LOGO-LOISIREL-whitout-back.png" alt="Loisirel" class="footer-logo"></span>
+        <p class="footer-title">Hôtel Savoia Resort &nbsp;★★★★</p>
+        <p>Bardonecchia, Italie — accès via les aéroports de Turin ou Milan</p>
+        <p class="footer-contact">Téléphone / WhatsApp : 06 12 20 28 61 &nbsp;·&nbsp; loisirel@hotmail.fr &nbsp;·&nbsp; www.loisirel.net</p>
+    </footer>
 
     <div id="lightboxOverlay" class="lightbox-overlay">
         <button type="button" id="lightboxClose" class="lightbox-close" aria-label="Fermer">&times;</button>
