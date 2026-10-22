@@ -79,7 +79,7 @@ a {
     justify-content: space-between;
     color: var(--paper);
     background:
-        linear-gradient(180deg, rgba(20, 19, 17, 0.55) 0%, rgba(20, 19, 17, 0.4) 35%, rgba(20, 19, 17, 0.5) 60%, rgba(20, 19, 17, 0.8) 100%),
+        linear-gradient(180deg, rgba(20, 19, 17, 0.55) 0%, rgba(20, 19, 17, 0.25) 40%, rgba(20, 19, 17, 0.75) 100%),
         url('image/hero-mountain.avif') center 42% / cover no-repeat;
     padding: 28px 48px 0;
 }
@@ -188,11 +188,6 @@ a {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     border-top: 1px solid rgba(251, 250, 247, 0.25);
-    margin: 0 -48px;
-    padding: 0 48px;
-    background: rgba(20, 19, 17, 0.38);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
 }
 
 .hero-fact {
@@ -250,8 +245,6 @@ a {
 
     .hero-facts {
         grid-template-columns: 1fr;
-        margin: 0 -16px;
-        padding: 0 16px;
     }
 
     .hero-fact {
