@@ -107,27 +107,10 @@ a {
     border-bottom: 1px solid rgba(251, 250, 247, 0.25);
 }
 
-/* Logo transparent : halo flouté et éclairci derrière, sans bords, pour qu'il ressorte */
 .logo-wrap,
 .footer-logo-wrap {
-    position: relative;
     display: inline-block;
-    padding: 10px 16px;
     line-height: 0;
-    isolation: isolate;
-}
-
-.logo-wrap::before,
-.footer-logo-wrap::before {
-    content: '';
-    position: absolute;
-    inset: -22px -40px;
-    z-index: -1;
-    background: radial-gradient(ellipse closest-side, rgba(251, 250, 247, 0.92) 0%, rgba(251, 250, 247, 0.75) 55%, rgba(251, 250, 247, 0) 100%);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    -webkit-mask-image: radial-gradient(ellipse closest-side, #000 60%, transparent 100%);
-    mask-image: radial-gradient(ellipse closest-side, #000 60%, transparent 100%);
 }
 
 .logo-img {
