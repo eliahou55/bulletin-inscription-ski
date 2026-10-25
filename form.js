@@ -109,7 +109,7 @@ function addFamilyRow(shouldCalculate = true) {
     const optionsRow = document.createElement('tr');
     optionsRow.className = 'family-options-row';
     optionsRow.style.display = 'none';
-    optionsRow.innerHTML = `<td colspan="6"><div class="member-options"></div></td>`;
+    optionsRow.innerHTML = `<td colspan="6"><p class="member-room-warning" hidden></p><div class="member-options"></div></td>`;
 
     tableBody.appendChild(row);
     tableBody.appendChild(optionsRow);
@@ -628,6 +628,7 @@ function computeRoomAssignments() {
 
             [...group.adults, ...group.enfants, ...group.bebes].forEach(row => {
                 row.querySelector('.member-room').classList.toggle('invalid-room', !valid);
+                setRoomWarning(row, valid ? '' : 'Chambre ' + roomNumber + ' ' + issue);
             });
         });
 
@@ -637,6 +638,7 @@ function computeRoomAssignments() {
         if (!row.dataset.type) {
             tarifDisplay.textContent = '-';
             row.querySelector('.member-room').classList.remove('invalid-room');
+            setRoomWarning(row, '');
             return;
         }
         const base = parseInt(row.dataset.baseTarif) || 0;
@@ -645,6 +647,15 @@ function computeRoomAssignments() {
     });
 
     return { roomSummaries, errors };
+}
+
+// Affiche (ou retire) le message d'erreur de chambre dans la carte du membre
+function setRoomWarning(row, message) {
+    const optionsRow = row.nextElementSibling;
+    const warning = optionsRow && optionsRow.querySelector('.member-room-warning');
+    if (!warning) return;
+    warning.textContent = message;
+    warning.hidden = !message;
 }
 
 function renderRoomsBreakdown(roomSummaries, errors) {
@@ -669,7 +680,7 @@ function renderRoomsBreakdown(roomSummaries, errors) {
 
         html += `<div class="room-summary-item${r.valid ? '' : ' room-summary-error'}">
             <span>Chambre ${r.roomNumber} : ${parts.join(' + ') || 'vide'}</span>
-            <span>${r.valid ? formatPrice(r.total) : 'Cette chambre ' + r.issue}</span>
+            <span>${r.valid ? formatPrice(r.total) : 'À compléter'}</span>
         </div>`;
     });
     html += '</div>';

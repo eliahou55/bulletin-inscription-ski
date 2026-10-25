@@ -941,17 +941,25 @@ a {
     color: var(--error);
 }
 
-/* Message d'erreur : sous le nom de la chambre, sur plusieurs lignes si besoin */
-.room-summary-item.room-summary-error {
-    flex-direction: column;
-    gap: 4px;
-}
-
 .room-summary-item.room-summary-error span:last-child {
     font-family: var(--sans);
-    font-size: 0.92em;
-    white-space: normal;
-    overflow-wrap: anywhere;
+    font-size: 0.8em;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+}
+
+/* Erreur de chambre dans la carte du membre concerné */
+.member-room-warning {
+    margin: 0;
+    padding-left: 12px;
+    border-left: 2px solid var(--error);
+    font-size: 0.86em;
+    line-height: 1.5;
+    color: var(--error);
+}
+
+.member-room-warning:not([hidden]) + .member-options:not(:empty) {
+    margin-top: 14px;
 }
 
 /* Tableau famille en cartes sur mobile */
