@@ -1014,252 +1014,302 @@ function generateDevisPDF(formData, download = true) {
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
 
-    const primaryColor   = [11, 95, 138];
-    const secondaryColor = [31, 143, 196];
-    const greenColor     = [39, 174, 96];
-    const orangeColor    = [255, 140, 58];
+    // Palette du site (ivoire, anthracite, laiton)
+    const INK    = [31, 30, 28];
+    const SOFT   = [58, 56, 53];
+    const TAUPE  = [125, 117, 104];
+    const BRASS  = [166, 138, 91];
+    const LINE   = [217, 210, 196];
+    const IVORY  = [245, 242, 236];
+    const NIGHT  = [35, 34, 31];
+    const PAPER  = [251, 250, 247];
 
-    let y = 10;
+    const L = 18, R = 192, W = R - L;
+    const BOTTOM = 270;
+    let y = 0;
+
+    const eur = n => String(Math.round(n || 0)).replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + ' €';
+
+    function font(family, style, size, color) {
+        doc.setFont(family, style);
+        doc.setFontSize(size);
+        doc.setTextColor(...color);
+    }
+
+    // Petites capitales espacées (libellés), comme les intitulés du site
+    function caps(text, x, yy, color, size, align) {
+        const spacing = 0.55;
+        font('helvetica', 'normal', size || 6.5, color || BRASS);
+        const t = String(text).toUpperCase();
+        let xx = x;
+        const w = doc.getTextWidth(t) + spacing * t.length;
+        if (align === 'right') xx = x - w;
+        else if (align === 'center') xx = x - w / 2;
+        doc.text(t, xx, yy, { charSpace: spacing });
+    }
+
+    function hairline(yy, color, x1, x2) {
+        doc.setDrawColor(...(color || LINE));
+        doc.setLineWidth(0.2);
+        doc.line(x1 || L, yy, x2 || R, yy);
+    }
 
     function checkBreak(needed) {
-        if (y + (needed || 10) > 278) { doc.addPage(); y = 12; }
+        if (y + (needed || 10) > BOTTOM) { doc.addPage(); y = 22; }
     }
 
-    function sectionHead(title) {
-        checkBreak(10);
-        doc.setFont(undefined, 'bold');
-        doc.setTextColor(...primaryColor);
-        doc.setFontSize(10);
-        doc.text(title, 10, y);
-        y += 7;
-        doc.setFont(undefined, 'normal');
-        doc.setTextColor(0, 0, 0);
-        doc.setFontSize(8.5);
-    }
-
-    // ── HEADER ──────────────────────────────────────────────
-    doc.setFillColor(...primaryColor);
-    doc.rect(0, 0, 210, 24, 'F');
-    if (typeof LOGO_BASE64 !== 'undefined') {
-        doc.setFillColor(255, 255, 255);
-        doc.roundedRect(6, 4, 26.5, 16, 2, 2, 'F');
-        doc.addImage(LOGO_BASE64, 'PNG', 7.3, 6.7, 24, 13.6);
-    }
-    doc.setTextColor(255, 255, 255);
-    doc.setFontSize(18);
-    doc.text("CONFIRMATION D'INSCRIPTION", 105, 10, { align: 'center' });
-    doc.setFontSize(11);
-    doc.text('LOISIREL SKI 2027 - HÔTEL SAVOIA RESORT BARDONECCHIA', 105, 18, { align: 'center' });
-    y = 29;
-
-    // Badge PENSION COMPLÈTE
-    doc.setFillColor(...orangeColor);
-    doc.roundedRect(60, y - 5, 90, 7, 2, 2, 'F');
-    doc.setFont(undefined, 'bold');
-    doc.setTextColor(58, 32, 0);
-    doc.setFontSize(9);
-    doc.text('PENSION COMPLÈTE GASTRONOMIQUE', 105, y, { align: 'center' });
-    doc.setTextColor(0, 0, 0);
-    if (formData.semaineDates) {
-        doc.setFontSize(11);
-        doc.text('Séjour du ' + formData.semaineDates + ' (semaine ' + formData.semaine + ')', 105, y + 8, { align: 'center' });
-        y += 7;
-    }
-    doc.setFont(undefined, 'normal');
-    y += 9;
-
-    // ── INFORMATIONS DE CONTACT ──────────────────────────────
-    sectionHead('INFORMATIONS DE CONTACT');
-    doc.setFontSize(9);
-    doc.text('Nom : ' + formData.nomContact + '     Prénom : ' + formData.prenomContact + '     Tél : ' + (formData.portable || 'N/A'), 10, y);
-    y += 5;
-    doc.text('Email : ' + (formData.emailContact || 'N/A'), 10, y);
-    y += 8;
-
-    // ── MEMBRES DE LA FAMILLE ────────────────────────────────
-    sectionHead('MEMBRES DE LA FAMILLE');
-    doc.setFontSize(8.5);
-    if (formData.familleMembers && formData.familleMembers.length > 0) {
-        const CAT_LABELS = { adulte: 'Adulte', enfant: 'Enfant', bebe: 'Bébé' };
-        formData.familleMembers.forEach((m, i) => {
-            checkBreak(5);
-            let info = m.categorie ? ' (' + (CAT_LABELS[m.categorie] || m.categorie) + ')' : '';
-            info += ' - chambre ' + (m.chambreNumero || 1);
-            if (m.categorie === 'enfant') {
-                if (m.tarifPromu) info += ' - tarif adulte (chambre)';
-                if (m.coursSki) info += ' - cours de ski ' + (m.age ? m.age + ' ans, ' : '') + (m.niveau || '') + ' (' + m.duree + '/jour)';
-                if (m.locationSki) info += ' - location ski';
-            } else if (m.categorie === 'adulte' && m.locationSki) {
-                info += ' - location ski';
-            }
-            info += ' : ' + (m.tarif || 0) + '€';
-            const lines = doc.splitTextToSize((i + 1) + '. ' + m.nom + ' ' + m.prenom + info, 190);
-            doc.text(lines, 10, y);
-            y += lines.length * 5;
-        });
-    }
-    y += 4;
-
-    // ── TARIF PAR CATÉGORIE ───────────────────────────────────
-    sectionHead('TARIF PAR CATÉGORIE');
-    doc.setFontSize(8.5);
-    if ((formData.chambresAdultes || 0) > 0) {
-        doc.text('Adultes : ' + formData.chambresAdultes + ' x ' + PRICES.adulte + '€ = ' + formData.tarifChambresAdultes + '€', 10, y); y += 5;
-    }
-    if ((formData.chambresEnfants || 0) > 0) {
-        doc.text('Enfants : ' + formData.chambresEnfants + ' = ' + formData.tarifChambresEnfants + '€', 10, y); y += 5;
-    }
-    if ((formData.bebes || 0) > 0) {
-        doc.text('Bébés : ' + formData.bebes + ' x ' + PRICES.bebe + '€ = ' + formData.tarifBebes + '€', 10, y); y += 5;
-    }
-    if ((formData.tarifOptions || 0) > 0) {
-        doc.text('Options ski (location / cours) : ' + formData.tarifOptions + '€', 10, y); y += 5;
-    }
-    if ((formData.supplementChambres || 0) > 0) {
-        doc.text('Supplément choix de chambres séparées : +' + formData.supplementChambres + '€', 10, y); y += 5;
-    }
-    y += 4;
-
-    // ── RÉPARTITION PAR CHAMBRE ────────────────────────────────
-    if (formData.chambresDetail && formData.chambresDetail.length > 0) {
-        sectionHead('RÉPARTITION PAR CHAMBRE (' + formData.nombreChambresReservees + ' chambre' + (formData.nombreChambresReservees > 1 ? 's' : '') + ' réservée' + (formData.nombreChambresReservees > 1 ? 's' : '') + ')');
-        doc.setFontSize(8.5);
-        formData.chambresDetail.forEach(c => {
-            checkBreak(5);
-            let line = 'Chambre ' + c.numero + ' : ' + c.adultes + ' adulte(s)';
-            if (c.enfants > 0) {
-                line += ' + ' + c.enfants + ' enfant(s)' + (c.promus > 0 ? ' (dont ' + c.promus + ' au tarif adulte)' : '');
-            }
-            if (c.bebes > 0) line += ' + ' + c.bebes + ' bébé(s)';
-            line += ' = ' + c.total + '€';
-            doc.text(line, 10, y); y += 5;
-        });
+    let sectionCount = 0;
+    function section(title, needed) {
+        checkBreak((needed || 0) + 16);
+        sectionCount++;
         y += 3;
-    }
-
-    // ── NOTES ────────────────────────────────────────────────
-    if (formData.notes) {
-        sectionHead('NOTES');
-        doc.setFontSize(8.5);
-        const noteLines = doc.splitTextToSize(formData.notes, 190);
-        doc.text(noteLines, 10, y);
-        y += noteLines.length * 5 + 4;
-    }
-
-    // ── RÉSUMÉ FINANCIER ─────────────────────────────────────
-    checkBreak(40);
-    doc.setDrawColor(...secondaryColor);
-    doc.setLineWidth(0.8);
-    doc.line(10, y, 200, y);
-    y += 5;
-
-    sectionHead('RÉSUMÉ FINANCIER');
-    doc.setFontSize(9);
-
-    doc.setFont(undefined, 'normal');
-    doc.setTextColor(0, 0, 0);
-
-    // Total avant remise (uniquement si remise appliquée)
-    const hasRemise = formData.remiseAppliquee === 'Oui' && (formData.remiseAmount || 0) > 0;
-    if (hasRemise) {
-        doc.setFont(undefined, 'normal');
-        doc.setTextColor(0, 0, 0);
-        doc.setFontSize(9);
-        doc.text('Total avant remise :', 10, y);
-        doc.text(formData.totalEUR + '€', 180, y, { align: 'right' });
+        caps(String(sectionCount).padStart(2, '0'), L, y);
+        font('times', 'normal', 15, INK);
+        doc.text(title, L + 9, y);
+        y += 3.5;
+        hairline(y);
         y += 6;
     }
 
-    // Bannière TOTAL
+    // Ligne libellé / détail / montant
+    function row(label, detail, amount, opts) {
+        opts = opts || {};
+        checkBreak(7);
+        font('helvetica', opts.bold ? 'bold' : 'normal', 9, opts.color || SOFT);
+        doc.text(label, L, y);
+        if (detail) {
+            font('helvetica', 'normal', 8.5, TAUPE);
+            doc.text(detail, L + 62, y);
+        }
+        if (amount !== undefined && amount !== null) {
+            font('helvetica', opts.bold ? 'bold' : 'normal', 9, opts.color || INK);
+            doc.text(String(amount), R, y, { align: 'right' });
+        }
+        y += 6;
+    }
+
+    // ── EN-TÊTE ─────────────────────────────────────────────
+    if (typeof LOGO_BASE64 !== 'undefined') {
+        doc.addImage(LOGO_BASE64, 'PNG', L - 1, 12, 30, 17);
+    }
+    caps('Loisirel Club Vacances — Hiver 2027', R, 18, BRASS, 6.5, 'right');
+    font('helvetica', 'normal', 8, TAUPE);
+    doc.text('Le ' + formData.dateSoumission, R, 24, { align: 'right' });
+
+    font('times', 'normal', 28, INK);
+    doc.text("Confirmation d'inscription", L, 45);
+    font('times', 'italic', 12.5, TAUPE);
+    doc.text('Loisirel Ski 2027 — Hôtel Savoia Resort, Bardonecchia', L, 53);
+    doc.setDrawColor(...BRASS);
+    doc.setLineWidth(0.35);
+    doc.line(L, 59, L + 24, 59);
+
+    // Bandeau d'informations (séjour / formule / voyageurs)
+    y = 66;
+    doc.setFillColor(...PAPER);
+    doc.rect(L, y, W, 22, 'F');
+    hairline(y, LINE); hairline(y + 22, LINE);
+    const col = W / 3;
+    const nbChambres = formData.nombreChambresReservees || 0;
+    const facts = [
+        ['Séjour', formData.semaineDates || '14 au 21 février 2027', formData.semaine ? 'Semaine ' + formData.semaine + ' · 7 nuits' : '7 nuits'],
+        ['Formule', 'Pension complète', 'Gastronomique'],
+        ['Voyageurs', (formData.nombrePersonnes || 0) + ' personne' + (formData.nombrePersonnes > 1 ? 's' : ''),
+            nbChambres + ' chambre' + (nbChambres > 1 ? 's' : '')]
+    ];
+    facts.forEach(([label, value, sub], i) => {
+        const cx = L + col * i + col / 2;
+        if (i > 0) {
+            doc.setDrawColor(...LINE);
+            doc.setLineWidth(0.2);
+            doc.line(L + col * i, y + 5, L + col * i, y + 17);
+        }
+        caps(label, cx, y + 6.5, BRASS, 6, 'center');
+        font('times', 'normal', 12.5, INK);
+        doc.text(value, cx, y + 13, { align: 'center' });
+        font('helvetica', 'normal', 7.5, TAUPE);
+        doc.text(sub, cx, y + 18, { align: 'center' });
+    });
+    y += 30;
+
+    // ── CONTACT ─────────────────────────────────────────────
+    section('Informations de contact');
+    const contact = [
+        ['Nom', formData.nomContact], ['Prénom', formData.prenomContact],
+        ['Téléphone', formData.portable || '—'], ['Email', formData.emailContact || '—']
+    ];
+    contact.forEach(([label, value], i) => {
+        const x = i % 2 === 0 ? L : L + W / 2;
+        const yy = y + Math.floor(i / 2) * 11;
+        caps(label, x, yy, TAUPE, 6);
+        font('helvetica', 'normal', 9.5, INK);
+        doc.text(String(value), x, yy + 5);
+    });
+    y += 23;
+
+    // ── MEMBRES DE LA FAMILLE ───────────────────────────────
+    const membres = formData.familleMembers || [];
+    section('Membres de la famille', 12);
+    const COLS = { nom: L, cat: L + 56, ch: L + 78, presta: L + 92 };
+    caps('Voyageur', COLS.nom, y, TAUPE, 6);
+    caps('Catégorie', COLS.cat, y, TAUPE, 6);
+    caps('Ch.', COLS.ch, y, TAUPE, 6);
+    caps('Prestations', COLS.presta, y, TAUPE, 6);
+    caps('Tarif', R, y, TAUPE, 6, 'right');
+    y += 3;
+    hairline(y);
+    y += 5.5;
+    const CAT_LABELS = { adulte: 'Adulte', enfant: 'Enfant', bebe: 'Bébé' };
+    membres.forEach(m => {
+        const presta = [];
+        if (m.categorie === 'enfant') {
+            if (m.tarifPromu) presta.push('Tarif adulte (chambre)');
+            if (m.coursSki) presta.push('Cours de ski ' + (m.age ? m.age + ' ans, ' : '') + (m.niveau || '') + ', ' + m.duree + '/jour');
+            if (m.locationSki) presta.push('Location ski');
+        } else if (m.categorie === 'adulte' && m.locationSki) {
+            presta.push('Location ski');
+        }
+        font('helvetica', 'normal', 8, TAUPE);
+        const prestaLines = presta.length ? doc.splitTextToSize(presta.join(' · '), R - COLS.presta - 22) : ['—'];
+        font('times', 'normal', 11, INK);
+        const nameLines = doc.splitTextToSize((m.nom + ' ' + m.prenom).trim(), COLS.cat - COLS.nom - 3);
+        const h = Math.max(prestaLines.length * 3.8, nameLines.length * 4.4) + 3;
+        checkBreak(h);
+        doc.text(nameLines, COLS.nom, y);
+        font('helvetica', 'normal', 8.5, SOFT);
+        doc.text(CAT_LABELS[m.categorie] || m.categorie || '', COLS.cat, y);
+        doc.text(String(m.chambreNumero || 1), COLS.ch, y);
+        font('helvetica', 'normal', 8, TAUPE);
+        doc.text(prestaLines, COLS.presta, y);
+        font('helvetica', 'normal', 9, INK);
+        doc.text(eur(m.tarif), R, y, { align: 'right' });
+        y += h - 3 + 1.2;
+        hairline(y, [235, 230, 220]);
+        y += 4.6;
+    });
+    y += 2;
+
+    // ── TARIF PAR CATÉGORIE ─────────────────────────────────
+    section('Tarif par catégorie');
+    if ((formData.chambresAdultes || 0) > 0) row('Adultes', formData.chambresAdultes + ' × ' + eur(PRICES.adulte), eur(formData.tarifChambresAdultes));
+    if ((formData.chambresEnfants || 0) > 0) row('Enfants', String(formData.chambresEnfants), eur(formData.tarifChambresEnfants));
+    if ((formData.bebes || 0) > 0) row('Bébés', formData.bebes + ' × ' + eur(PRICES.bebe), eur(formData.tarifBebes));
+    if ((formData.tarifOptions || 0) > 0) row('Options ski', 'Location / cours', eur(formData.tarifOptions));
+    if ((formData.supplementChambres || 0) > 0) row('Supplément', 'Choix de chambres séparées', '+ ' + eur(formData.supplementChambres));
+
+    // ── RÉPARTITION PAR CHAMBRE ─────────────────────────────
+    if (formData.chambresDetail && formData.chambresDetail.length > 0) {
+        section('Répartition par chambre');
+        formData.chambresDetail.forEach(c => {
+            let detail = c.adultes + ' adulte' + (c.adultes > 1 ? 's' : '');
+            if (c.enfants > 0) {
+                detail += ' + ' + c.enfants + ' enfant' + (c.enfants > 1 ? 's' : '') + (c.promus > 0 ? ' (dont ' + c.promus + ' au tarif adulte)' : '');
+            }
+            if (c.bebes > 0) detail += ' + ' + c.bebes + ' bébé' + (c.bebes > 1 ? 's' : '');
+            row('Chambre ' + c.numero, detail, eur(c.total));
+        });
+    }
+
+    // ── NOTES ───────────────────────────────────────────────
+    if (formData.notes) {
+        font('times', 'italic', 10.5, SOFT);
+        const noteLines = doc.splitTextToSize(formData.notes, W - 12);
+        section('Notes', noteLines.length * 4.6 + 8);
+        const h = noteLines.length * 4.6 + 6;
+        doc.setFillColor(...IVORY);
+        doc.rect(L, y - 4.5, W, h, 'F');
+        doc.setFillColor(...BRASS);
+        doc.rect(L, y - 4.5, 0.6, h, 'F');
+        font('times', 'italic', 10.5, SOFT);
+        doc.text(noteLines, L + 6, y + 0.5);
+        y += h + 2;
+    }
+
+    // ── RÉSUMÉ FINANCIER ────────────────────────────────────
+    const hasRemise = formData.remiseAppliquee === 'Oui' && (formData.remiseAmount || 0) > 0;
     const finalTotal = hasRemise ? formData.totalApresRemise : formData.totalEUR;
-    doc.setFillColor(...secondaryColor);
-    doc.rect(10, y - 2, 190, 7, 'F');
-    doc.setFont(undefined, 'bold');
-    doc.setTextColor(255, 255, 255);
-    doc.setFontSize(10);
-    doc.text(hasRemise ? 'TOTAL APRES REMISE :' : 'TOTAL :', 10, y + 2);
-    doc.text(finalTotal + '€', 180, y + 2, { align: 'right' });
-    y += 10;
-
-    // Remise en vert à gauche (uniquement si remise appliquée)
-    if (hasRemise && formData.totalEUR > 0) {
-        const pct = Math.round(((formData.totalEUR - formData.remiseAmount) / formData.totalEUR) * 100);
-        doc.setFont(undefined, 'bold');
-        doc.setTextColor(...greenColor);
-        doc.setFontSize(11);
-        doc.text('REDUCTION : -' + pct + '%', 10, y);
-        y += 7;
+    section('Résumé financier', 48);
+    if (hasRemise) {
+        row('Total avant remise', null, eur(formData.totalEUR));
+        if (formData.totalEUR > 0) {
+            const pct = Math.round(((formData.totalEUR - formData.remiseAmount) / formData.totalEUR) * 100);
+            row('Réduction', null, '- ' + pct + ' %', { color: BRASS, bold: true });
+        }
     }
-
-    doc.setFont(undefined, 'bold');
-    doc.setTextColor(...primaryColor);
-    doc.setFontSize(9);
+    doc.setFillColor(...NIGHT);
+    doc.rect(L, y - 3, W, 16, 'F');
+    caps(hasRemise ? 'Total après remise' : 'Total du séjour', L + 7, y + 6.3, [227, 211, 180], 7);
+    font('times', 'normal', 20, [245, 242, 236]);
+    doc.text(eur(finalTotal), R - 7, y + 7.5, { align: 'right' });
+    y += 20;
     if (formData.paiementIntegral) {
-        doc.setTextColor(...greenColor);
-        doc.setFontSize(10);
-        doc.text('TOTAL RÉGLÉ EN INTÉGRALITÉ', 10, y);
-        doc.text(finalTotal + '€', 180, y, { align: 'right' });
-        y += 8;
-        doc.setTextColor(...primaryColor);
-        doc.setFontSize(9);
+        row('Réglé en intégralité', null, eur(finalTotal), { color: BRASS, bold: true });
     } else {
-        doc.text('Acompte 50% :', 10, y);
-        doc.text(formData.acomptEUR + '€', 180, y, { align: 'right' });
-        y += 5;
-        doc.text('Solde :', 10, y);
-        doc.text(formData.soldeEUR + '€', 180, y, { align: 'right' });
-        y += 8;
+        row('Acompte 50 % à la réservation', null, eur(formData.acomptEUR));
+        row('Solde', null, eur(formData.soldeEUR));
     }
 
-    // ── FRAIS COMPLÉMENTAIRES ─────────────────────────────────
-    sectionHead('FRAIS COMPLÉMENTAIRES (non inclus dans le total)');
-    doc.setFontSize(8.5);
-    doc.text('Nombre de chambres réservées : ' + (formData.nombreChambresReservees || 0), 10, y); y += 5;
-    doc.text('Caution : ' + formData.cautionEUR + '€ par chambre (remboursable), soit ' + ((formData.cautionEUR || 0) * (formData.nombreChambresReservees || 0)) + '€ au total', 10, y); y += 5;
-    doc.text('Taxe de séjour : ' + formData.taxeSejourEUR + '€ (' + formData.chambresAdultes + ' adulte(s) x ' + PRICES.taxeSejourParAdulte + '€), payable sur place', 10, y); y += 5;
-    doc.text('Skipass à acheter sur place ou en ligne (non inclus)', 10, y); y += 8;
+    // ── FRAIS COMPLÉMENTAIRES ───────────────────────────────
+    section('Frais complémentaires', 26);
+    font('helvetica', 'italic', 7.5, TAUPE);
+    doc.text('Non inclus dans le total ci-dessus', L, y - 1.5);
+    y += 4.5;
+    row('Caution (remboursable)', nbChambres + ' chambre' + (nbChambres > 1 ? 's' : '') + ' × ' + eur(formData.cautionEUR),
+        eur((formData.cautionEUR || 0) * nbChambres));
+    row('Taxe de séjour', formData.chambresAdultes + ' adulte' + (formData.chambresAdultes > 1 ? 's' : '') + ' × ' + eur(PRICES.taxeSejourParAdulte) + ', payable sur place',
+        eur(formData.taxeSejourEUR));
+    row('Skipass', 'À acheter sur place ou en ligne', 'Non inclus');
 
-    // ── RÈGLEMENT ────────────────────────────────────────────
-    sectionHead('REGLEMENT');
-    doc.setFontSize(8.5);
-    doc.setFont(undefined, 'bold');
-    doc.text('Titulaire du compte : TOVEL', 10, y); y += 5;
-    doc.setFont(undefined, 'normal');
-    doc.text('IBAN : FR76 1820 6002 1365 0425 2422 502   |   BIC : AGRFRPP882', 10, y); y += 5;
-    doc.text('Libelle du virement : Nom Prenom - Ski 2027', 10, y); y += 7;
+    // ── RÈGLEMENT ───────────────────────────────────────────
+    section('Règlement', 30);
+    doc.setFillColor(...IVORY);
+    doc.rect(L, y - 4, W, 25, 'F');
+    const bank = [
+        ['Titulaire', 'TOVEL'],
+        ['IBAN', 'FR76 1820 6002 1365 0425 2422 502'],
+        ['BIC', 'AGRFRPP882'],
+        ['Libellé', (formData.nomContact + ' ' + formData.prenomContact).trim() + ' - Ski 2027']
+    ];
+    bank.forEach(([label, value], i) => {
+        caps(label, L + 7, y + 1.5 + i * 5.3, TAUPE, 6);
+        font('helvetica', i === 1 ? 'bold' : 'normal', 9, INK);
+        doc.text(value, L + 32, y + 1.5 + i * 5.3);
+    });
+    y += 27;
 
-    // ── CONDITIONS GÉNÉRALES ─────────────────────────────────
-    sectionHead('CONDITIONS GENERALES');
-    doc.setFontSize(8);
+    // ── CONDITIONS GÉNÉRALES ────────────────────────────────
+    section('Conditions générales', 24);
     const conds = [
-        'Chambres disponibles le dimanche a partir de 14h00.',
-        'Acompte de 50% a la reservation.',
+        'Chambres disponibles le dimanche à partir de 14h00.',
+        'Acompte de 50 % à la réservation.',
         'Caution de 100 euros par chambre (remboursable).',
-        "Taxe d'hebergement de 10 euros par adulte (+12 ans), payable sur place.",
-        'Skipass a acheter sur place ou en ligne. Adhesion TOVEL incluse.'
+        "Taxe d'hébergement de 10 euros par adulte (+12 ans), payable sur place.",
+        'Skipass à acheter sur place ou en ligne. Adhésion TOVEL incluse.'
     ];
     conds.forEach(c => {
-        const lines = doc.splitTextToSize('- ' + c, 186);
-        checkBreak(lines.length * 3.8 + 1);
-        doc.text(lines, 10, y);
-        y += lines.length * 3.8 + 0.5;
+        font('helvetica', 'normal', 8.5, SOFT);
+        const lines = doc.splitTextToSize(c, W - 6);
+        checkBreak(lines.length * 4 + 1);
+        doc.setFillColor(...BRASS);
+        doc.rect(L, y - 1.3, 1.2, 0.3, 'F');
+        doc.text(lines, L + 5, y);
+        y += lines.length * 4 + 1.2;
     });
-    y += 3;
+    y += 2;
 
-    // ── CONTACT ────────────────────────────────────────────
-    sectionHead('QUESTIONS / INFORMATIONS');
-    doc.setFontSize(8.5);
-    doc.text('Téléphone / WhatsApp : 06 12 20 28 61   |   Email : loisirel@hotmail.fr   |   www.loisirel.net', 10, y); y += 5;
+    // ── CONTACT ─────────────────────────────────────────────
+    section('Questions / informations', 8);
+    font('helvetica', 'normal', 8.5, SOFT);
+    doc.text('Téléphone / WhatsApp : 06 12 20 28 61     Email : loisirel@hotmail.fr     www.loisirel.net', L, y);
 
-    // ── FOOTER — fixé au bas de la page ──────────────────────
-    y = Math.max(y + 4, 270);
-    doc.setDrawColor(...secondaryColor);
-    doc.setLineWidth(0.5);
-    doc.line(10, 276, 200, 276);
-    doc.setFont(undefined, 'normal');
-    doc.setFontSize(7.5);
-    doc.setTextColor(100, 100, 100);
-    doc.text('Hôtel Savoia Resort **** - Bardonecchia, Italie   |   Date : ' + formData.dateSoumission, 105, 281, { align: 'center' });
+    // ── PIED DE PAGE — sur chaque page ──────────────────────
+    const pages = doc.getNumberOfPages();
+    for (let p = 1; p <= pages; p++) {
+        doc.setPage(p);
+        hairline(280, LINE);
+        caps('Hôtel Savoia Resort · Bardonecchia, Italie', L, 285, TAUPE, 6);
+        caps('Page ' + p + ' / ' + pages, R, 285, TAUPE, 6, 'right');
+    }
 
     // ── SAVE / RETURN ─────────────────────────────────────────
     const filename = 'Devis_Ski_' + formData.nomContact + '_' + formData.prenomContact + '_' + new Date().getTime() + '.pdf';
