@@ -4,6 +4,12 @@ const CONFIG = {
     EMAIL_SERVICE_URL: '/.netlify/functions',
 };
 
+// Semaines proposées (chaque semaine a son propre Google Sheet, voir script.gs)
+const SEMAINES = {
+    1: "14 au 21 février 2027",
+    2: "21 au 28 février 2027"
+};
+
 // Tarifs (séjour Ski 2027 - Bardonecchia)
 // Logique chambre : chaque chambre doit rapporter un minimum de ROOM_MIN_REVENUE
 // et contenir entre ROOM_MIN_PEOPLE et ROOM_MAX_PEOPLE personnes (bébés exclus du calcul).
@@ -818,6 +824,11 @@ function showStatus(message, type = 'info') {
 }
 
 function validateForm() {
+    if (!document.querySelector('input[name="semaine"]:checked')) {
+        showStatus('⚠️ Veuillez choisir votre semaine de séjour', 'error');
+        return false;
+    }
+
     const nomContact = document.getElementById('nomContact').value.trim();
     const prenomContact = document.getElementById('prenomContact').value.trim();
 
@@ -873,7 +884,11 @@ function getFormData() {
     const optimalCost = computeOptimalCost(countAdulte, countEnfant);
     const supplementChambres = Math.max(0, (tarifAdulte + tarifEnfant) - optimalCost);
 
+    const semaine = document.querySelector('input[name="semaine"]:checked').value;
+
     return {
+        semaine: semaine,
+        semaineDates: SEMAINES[semaine],
         nomContact: document.getElementById('nomContact').value.trim(),
         prenomContact: document.getElementById('prenomContact').value.trim(),
         portable: document.getElementById('portable').value.trim() || '',
@@ -1044,8 +1059,13 @@ function generateDevisPDF(formData, download = true) {
     doc.setTextColor(58, 32, 0);
     doc.setFontSize(9);
     doc.text('PENSION COMPLÈTE GASTRONOMIQUE', 105, y, { align: 'center' });
-    doc.setFont(undefined, 'normal');
     doc.setTextColor(0, 0, 0);
+    if (formData.semaineDates) {
+        doc.setFontSize(11);
+        doc.text('Séjour du ' + formData.semaineDates + ' (semaine ' + formData.semaine + ')', 105, y + 8, { align: 'center' });
+        y += 7;
+    }
+    doc.setFont(undefined, 'normal');
     y += 9;
 
     // ── INFORMATIONS DE CONTACT ──────────────────────────────

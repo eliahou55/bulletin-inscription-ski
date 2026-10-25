@@ -12,6 +12,12 @@ const SHEET_COURS_SKI = "Cours de Ski";
 const SHEET_LOCATIONS = "Locations";
 const SHEET_CHAMBRES = "Chambres";
 
+// Semaine 1 (14-21 fév.) : le Sheet auquel ce script est rattaché.
+// Semaine 2 (21-28 fév.) : un second Sheet, même structure, créé par creerSheetSemaine2()
+// et retrouvé ensuite grâce à son ID mémorisé dans les propriétés du script.
+const SHEET_SEMAINE_2_NAME = "Inscriptions Ski 2027 - Semaine 2";
+const PROP_SHEET_SEMAINE_2 = "SHEET_SEMAINE_2_ID";
+
 // Dossier Drive (même compte que le Sheet) où chaque devis PDF est archivé
 const DEVIS_FOLDER_NAME = "Devis Ski 2027";
 
@@ -87,13 +93,14 @@ function doPost(e) {
 
 function addDataToSheets(data) {
   try {
-    const spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
+    const semaine2 = String(data.semaine) === '2';
+    const spreadsheet = semaine2 ? getSheetSemaine2() : SpreadsheetApp.getActiveSpreadsheet();
     const color = generateRandomColor();
     const dateSoumission = data.dateSoumission || new Date().toLocaleDateString('fr-FR');
 
     // ---- Feuille générale "Inscriptions" ----
     const sheetInscriptions = getOrCreateSheet(spreadsheet, SHEET_INSCRIPTIONS, HEADERS_INSCRIPTIONS);
-    const inscriptionId = 'SKI-2027-' + (sheetInscriptions.getLastRow());
+    const inscriptionId = (semaine2 ? 'SKI-2027-S2-' : 'SKI-2027-') + (sheetInscriptions.getLastRow());
 
     let membres = [];
     try {
@@ -249,6 +256,46 @@ function getOrCreateSheet(spreadsheet, name, headers) {
     sheet.setFrozenRows(1);
   }
   return sheet;
+}
+
+function getSheetSemaine2() {
+  const props = PropertiesService.getScriptProperties();
+  const id = props.getProperty(PROP_SHEET_SEMAINE_2);
+  if (id) return SpreadsheetApp.openById(id);
+
+  // Verrou : deux inscriptions simultanées ne doivent pas créer deux fichiers
+  const lock = LockService.getScriptLock();
+  lock.waitLock(30000);
+  try {
+    const existing = props.getProperty(PROP_SHEET_SEMAINE_2);
+    if (existing) return SpreadsheetApp.openById(existing);
+
+    const spreadsheet = SpreadsheetApp.create(SHEET_SEMAINE_2_NAME);
+    getOrCreateSheet(spreadsheet, SHEET_INSCRIPTIONS, HEADERS_INSCRIPTIONS);
+    getOrCreateSheet(spreadsheet, SHEET_COURS_SKI, HEADERS_COURS_SKI);
+    getOrCreateSheet(spreadsheet, SHEET_LOCATIONS, HEADERS_LOCATIONS);
+    getOrCreateSheet(spreadsheet, SHEET_CHAMBRES, HEADERS_CHAMBRES);
+    // Retire l'onglet vide créé par défaut ("Feuille 1")
+    spreadsheet.getSheets().forEach(sheet => {
+      if ([SHEET_INSCRIPTIONS, SHEET_COURS_SKI, SHEET_LOCATIONS, SHEET_CHAMBRES].indexOf(sheet.getName()) === -1) {
+        spreadsheet.deleteSheet(sheet);
+      }
+    });
+
+    // Range le nouveau fichier dans le même dossier Drive que le Sheet de la semaine 1
+    const parents = DriveApp.getFileById(SpreadsheetApp.getActiveSpreadsheet().getId()).getParents();
+    if (parents.hasNext()) DriveApp.getFileById(spreadsheet.getId()).moveTo(parents.next());
+
+    props.setProperty(PROP_SHEET_SEMAINE_2, spreadsheet.getId());
+    return spreadsheet;
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+// À lancer une fois depuis l'éditeur : autorise la création du fichier et crée le Sheet de la semaine 2.
+function creerSheetSemaine2() {
+  Logger.log('Sheet semaine 2 : ' + getSheetSemaine2().getUrl());
 }
 
 function getDevisFolder() {

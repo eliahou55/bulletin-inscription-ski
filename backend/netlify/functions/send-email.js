@@ -51,7 +51,7 @@ exports.handler = async (event) => {
 
     try {
         await sendEmail(formData.emailContact, "Confirmation d'inscription - Ski 2027", buildClientHTML(formData, finalTotal));
-        await sendEmail(ORGANIZER_EMAIL, `Nouvelle inscription - ${formData.nomContact} ${formData.prenomContact} - Ski 2027`, buildOrganizerHTML(formData, finalTotal));
+        await sendEmail(ORGANIZER_EMAIL, `Nouvelle inscription - ${formData.nomContact} ${formData.prenomContact} - Ski 2027${formData.semaine ? ' - Semaine ' + formData.semaine : ''}`, buildOrganizerHTML(formData, finalTotal));
         return { statusCode: 200, headers: CORS, body: JSON.stringify({ success: true }) };
     } catch (error) {
         console.error('Erreur email:', error);
@@ -72,7 +72,7 @@ function buildClientHTML(data, finalTotal) {
   <tr><td style="padding:30px;">
     <h2 style="color:#0b5f8a;margin-top:0;">Confirmation d'inscription</h2>
     <p>Bonjour <strong>${data.prenomContact} ${data.nomContact}</strong>,</p>
-    <p>Nous avons bien recu votre inscription pour le sejour au ski 2027. Votre devis complet est joint en piece attachee.</p>
+    <p>Nous avons bien recu votre inscription pour le sejour au ski 2027${data.semaineDates ? ' du ' + data.semaineDates : ''}. Votre devis complet est joint en piece attachee.</p>
     <p style="display:inline-block;background:#ff8c3a;color:#3a2000;font-weight:800;padding:6px 16px;border-radius:999px;font-size:13px;">PENSION COMPLÈTE GASTRONOMIQUE</p>
     <table width="100%" cellpadding="8" cellspacing="0" style="border-collapse:collapse;font-size:14px;">
       <tr style="background:#e7f4fb;"><td style="border:1px solid #ddd;"><strong>Contact</strong></td><td style="border:1px solid #ddd;">${data.prenomContact} ${data.nomContact} — ${data.portable || 'N/A'}</td></tr>
@@ -128,6 +128,7 @@ function buildOrganizerHTML(data, finalTotal) {
   <tr><td style="padding:25px;">
     <h2 style="color:#0b5f8a;margin-top:0;">${data.prenomContact} ${data.nomContact}</h2>
     <table width="100%" cellpadding="7" cellspacing="0" style="border-collapse:collapse;font-size:14px;">
+      ${data.semaineDates ? `<tr><td style="border:1px solid #ddd;"><strong>Semaine</strong></td><td style="border:1px solid #ddd;"><strong>Semaine ${data.semaine} — du ${data.semaineDates}</strong></td></tr>` : ''}
       <tr style="background:#e7f4fb;"><td style="border:1px solid #ddd;width:40%;"><strong>Telephone</strong></td><td style="border:1px solid #ddd;">${data.portable || 'N/A'}</td></tr>
       <tr><td style="border:1px solid #ddd;"><strong>Email</strong></td><td style="border:1px solid #ddd;">${data.emailContact}</td></tr>
       <tr style="background:#e7f4fb;"><td style="border:1px solid #ddd;"><strong>Personnes</strong></td><td style="border:1px solid #ddd;">${data.nombrePersonnes} (${data.chambresAdultes} adultes, ${data.chambresEnfants} enfants, ${data.bebes} bebes)</td></tr>

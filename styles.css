@@ -723,6 +723,62 @@ a {
     cursor: pointer;
 }
 
+/* Choix de la semaine */
+.week-choice {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+.week-option {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 22px 24px;
+    border: 1px solid var(--line);
+    background: var(--paper);
+    cursor: pointer;
+    transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.week-option:hover {
+    border-color: var(--taupe);
+}
+
+.week-option input[type="radio"] {
+    position: absolute;
+    top: 22px;
+    right: 22px;
+    accent-color: var(--brass);
+    cursor: pointer;
+}
+
+.week-label {
+    font-size: 0.72em;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: var(--taupe);
+}
+
+.week-dates {
+    font-family: var(--serif);
+    font-size: 1.45em;
+    color: var(--ink);
+}
+
+.week-option:has(input:checked) {
+    border-color: var(--ink);
+    background: var(--ivory);
+    box-shadow: inset 0 0 0 1px var(--ink);
+}
+
+@media (max-width: 700px) {
+    .week-choice {
+        grid-template-columns: 1fr;
+    }
+}
+
 .member-room,
 .opt-cours-details select {
     width: 100%;
