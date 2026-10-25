@@ -567,6 +567,9 @@ function computeRoomAssignments() {
 
     const roomSummaries = [];
     const errors = [];
+    // Tant qu'un seul membre est renseigné, sa chambre est forcément incomplète :
+    // on n'affiche pas l'erreur (la soumission reste bloquée par validateForm)
+    const quiet = rows.filter(row => row.dataset.type).length <= 1;
 
     Object.keys(rooms)
         .map(Number)
@@ -618,6 +621,7 @@ function computeRoomAssignments() {
                 bebes: group.bebes.length,
                 promoted: promoteCount,
                 valid,
+                quiet,
                 issue,
                 total: roomTotal
             });
@@ -627,8 +631,8 @@ function computeRoomAssignments() {
             }
 
             [...group.adults, ...group.enfants, ...group.bebes].forEach(row => {
-                row.querySelector('.member-room').classList.toggle('invalid-room', !valid);
-                setRoomWarning(row, valid ? '' : 'Chambre ' + roomNumber + ' ' + issue);
+                row.querySelector('.member-room').classList.toggle('invalid-room', !valid && !quiet);
+                setRoomWarning(row, valid || quiet ? '' : 'Chambre ' + roomNumber + ' ' + issue);
             });
         });
 
@@ -678,9 +682,10 @@ function renderRoomsBreakdown(roomSummaries, errors) {
         }
         if (r.bebes > 0) parts.push(CAT_PLURAL(r.bebes, 'bébé', 'bébés'));
 
-        html += `<div class="room-summary-item${r.valid ? '' : ' room-summary-error'}">
+        const showError = !r.valid && !r.quiet;
+        html += `<div class="room-summary-item${showError ? ' room-summary-error' : ''}">
             <span>Chambre ${r.roomNumber} : ${parts.join(' + ') || 'vide'}</span>
-            <span>${r.valid ? formatPrice(r.total) : 'À compléter'}</span>
+            <span>${showError ? 'À compléter' : formatPrice(r.total)}</span>
         </div>`;
     });
     html += '</div>';
