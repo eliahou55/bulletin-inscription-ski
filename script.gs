@@ -20,6 +20,8 @@ const PROP_SHEET_SEMAINE_2 = "SHEET_SEMAINE_2_ID";
 
 // Dossier Drive (même compte que le Sheet) où chaque devis PDF est archivé
 const DEVIS_FOLDER_NAME = "Devis Ski 2027";
+// Sous-dossiers de "Devis Ski 2027", un par semaine (les noms doivent correspondre exactement)
+const DEVIS_SUBFOLDER_NAMES = { 1: "Devis PDF sem 1", 2: "Devis PDF sem 2" };
 
 // ---- Headers (doivent correspondre exactement aux colonnes de chaque feuille) ----
 
@@ -310,7 +312,10 @@ function autoriserDrive() {
 }
 
 function saveDevisPDF(data, inscriptionId) {
-  const folder = getDevisFolder();
+  const name = DEVIS_SUBFOLDER_NAMES[String(data.semaine) === '2' ? 2 : 1];
+  const parent = getDevisFolder();
+  const subfolders = parent.getFoldersByName(name);
+  const folder = subfolders.hasNext() ? subfolders.next() : parent.createFolder(name);
   const filename = inscriptionId + '_Devis_Ski_' + data.nomContact + '_' + data.prenomContact + '.pdf';
   const blob = Utilities.newBlob(Utilities.base64Decode(data.pdfBase64), 'application/pdf', filename);
   return folder.createFile(blob).getUrl();
