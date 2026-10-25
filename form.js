@@ -580,7 +580,8 @@ function computeRoomAssignments() {
             if (peopleCount < ROOM_MIN_PEOPLE) {
                 valid = false;
                 const missing = ROOM_MIN_PEOPLE - peopleCount;
-                issue = `ne contient qu'${peopleCount} personne${peopleCount > 1 ? 's' : ''} — ajoutez ${missing} personne${missing > 1 ? 's' : ''} ou regroupez avec une autre chambre`;
+                const who = peopleCount === 0 ? "aucune personne (hors bébés)" : peopleCount === 1 ? "qu'une seule personne" : 'que ' + peopleCount + ' personnes';
+                issue = `ne contient ${who} — ajoutez ${missing} personne${missing > 1 ? 's' : ''} ou regroupez avec une autre chambre`;
             } else if (peopleCount > ROOM_MAX_PEOPLE) {
                 valid = false;
                 issue = `contient ${peopleCount} personnes (maximum ${ROOM_MAX_PEOPLE}, bébés non comptés) — déplacez quelqu'un vers une autre chambre`;
@@ -668,7 +669,7 @@ function renderRoomsBreakdown(roomSummaries, errors) {
 
         html += `<div class="room-summary-item${r.valid ? '' : ' room-summary-error'}">
             <span>Chambre ${r.roomNumber} : ${parts.join(' + ') || 'vide'}</span>
-            <span>${r.valid ? formatPrice(r.total) : '⚠️ ' + r.issue}</span>
+            <span>${r.valid ? formatPrice(r.total) : 'Cette chambre ' + r.issue}</span>
         </div>`;
     });
     html += '</div>';
