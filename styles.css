@@ -748,17 +748,11 @@ a {
 
 .week-option input[type="radio"] {
     position: absolute;
-    top: 22px;
+    top: 50%;
     right: 22px;
+    transform: translateY(-50%);
     accent-color: var(--brass);
     cursor: pointer;
-}
-
-.week-label {
-    font-size: 0.72em;
-    letter-spacing: 0.28em;
-    text-transform: uppercase;
-    color: var(--taupe);
 }
 
 .week-dates {

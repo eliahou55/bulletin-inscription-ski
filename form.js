@@ -1112,7 +1112,7 @@ function generateDevisPDF(formData, download = true) {
     const col = W / 3;
     const nbChambres = formData.nombreChambresReservees || 0;
     const facts = [
-        ['Séjour', formData.semaineDates || '14 au 21 février 2027', formData.semaine ? 'Semaine ' + formData.semaine + ' · 7 nuits' : '7 nuits'],
+        ['Séjour', formData.semaineDates || '14 au 21 février 2027', '7 nuits'],
         ['Formule', 'Pension complète', 'Gastronomique'],
         ['Voyageurs', (formData.nombrePersonnes || 0) + ' personne' + (formData.nombrePersonnes > 1 ? 's' : ''),
             nbChambres + ' chambre' + (nbChambres > 1 ? 's' : '')]
